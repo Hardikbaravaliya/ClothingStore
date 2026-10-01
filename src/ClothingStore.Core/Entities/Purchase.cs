@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 /// <summary>Stock received from a supplier. Saving it increases stock and updates AvgCostPrice.</summary>
 public class Purchase : TenantEntity
 {
-    public Guid SupplierId { get; set; }
+    public int SupplierId { get; set; }
     public Supplier Supplier { get; set; } = default!;
 
     public DateTime PurchaseDate { get; set; }
@@ -25,10 +25,10 @@ public class Purchase : TenantEntity
 
 public class PurchaseItem : TenantEntity
 {
-    public Guid PurchaseId { get; set; }
+    public int PurchaseId { get; set; }
     public Purchase Purchase { get; set; } = default!;
 
-    public Guid ProductVariantId { get; set; }
+    public int ProductVariantId { get; set; }
     public ProductVariant ProductVariant { get; set; } = default!;
 
     public int Quantity { get; set; }

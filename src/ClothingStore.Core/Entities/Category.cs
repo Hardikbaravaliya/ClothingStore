@@ -12,7 +12,7 @@ public class Category : TenantEntity
     public int SortOrder { get; set; }
     public bool IsActive { get; set; } = true;
 
-    public Guid? ParentId { get; set; }
+    public int? ParentId { get; set; }
     public Category? Parent { get; set; }
     public ICollection<Category> Children { get; set; } = [];
 

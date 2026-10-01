@@ -16,7 +16,7 @@ public class Tenant : BaseEntity
 
     public TenantStatus Status { get; set; } = TenantStatus.Trial;
 
-    public Guid? PlanId { get; set; }
+    public int? PlanId { get; set; }
     public SubscriptionPlan? Plan { get; set; }
 
     public TenantSettings? Settings { get; set; }

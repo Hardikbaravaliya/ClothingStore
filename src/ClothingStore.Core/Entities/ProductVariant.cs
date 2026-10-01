@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 /// <summary>Size + Color combination with its own SKU and stock.</summary>
 public class ProductVariant : TenantEntity
 {
-    public Guid ProductId { get; set; }
+    public int ProductId { get; set; }
     public Product Product { get; set; } = default!;
 
     public string Size { get; set; } = default!;

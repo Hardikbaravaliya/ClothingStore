@@ -24,7 +24,7 @@ public class Product : TenantEntity
     public string? MetaTitle { get; set; }
     public string? MetaDescription { get; set; }
 
-    public Guid CategoryId { get; set; }
+    public int CategoryId { get; set; }
     public Category Category { get; set; } = default!;
 
     public ICollection<ProductImage> Images { get; set; } = [];

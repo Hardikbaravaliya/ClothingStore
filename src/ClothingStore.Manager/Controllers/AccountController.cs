@@ -29,7 +29,7 @@ public class AccountController(
             return View(model);
 
         // Staff email is unique per store, so the store must be known before looking up the user
-        Guid? tenantId = null;
+        int? tenantId = null;
         if (!string.IsNullOrWhiteSpace(model.StoreCode))
         {
             var tenant = await tenantResolver.ResolveAsync(model.StoreCode, HttpContext.RequestAborted);

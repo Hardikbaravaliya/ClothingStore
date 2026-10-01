@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 
 public class Payment : TenantEntity
 {
-    public Guid OrderId { get; set; }
+    public int OrderId { get; set; }
     public Order Order { get; set; } = default!;
 
     public PaymentMethod Method { get; set; }

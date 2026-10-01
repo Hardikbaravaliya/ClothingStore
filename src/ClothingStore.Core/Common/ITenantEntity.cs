@@ -6,10 +6,10 @@ namespace ClothingStore.Core.Common;
 /// </summary>
 public interface ITenantEntity
 {
-    Guid TenantId { get; set; }
+    int TenantId { get; set; }
 }
 
 public abstract class TenantEntity : BaseEntity, ITenantEntity
 {
-    public Guid TenantId { get; set; }
+    public int TenantId { get; set; }
 }

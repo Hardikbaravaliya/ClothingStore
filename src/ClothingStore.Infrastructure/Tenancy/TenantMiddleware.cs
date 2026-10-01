@@ -60,7 +60,7 @@ public sealed class ClaimsTenantMiddleware(RequestDelegate next, ILogger<ClaimsT
     public async Task InvokeAsync(HttpContext context, ITenantResolver resolver, ITenantProvider tenantProvider)
     {
         var claim = context.User.FindFirstValue(AppClaimTypes.TenantId);
-        if (claim is null || !Guid.TryParse(claim, out var tenantId))
+        if (claim is null || !int.TryParse(claim, out var tenantId))
         {
             await next(context);
             return;

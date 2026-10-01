@@ -21,7 +21,7 @@ public interface ITenantResolver
     /// </summary>
     Task<TenantInfo?> ResolveAsync(string? key, CancellationToken ct = default);
 
-    Task<TenantInfo?> GetByIdAsync(Guid tenantId, CancellationToken ct = default);
+    Task<TenantInfo?> GetByIdAsync(int tenantId, CancellationToken ct = default);
 }
 
 public sealed class TenantResolver(AppDbContext db, IMemoryCache cache, IOptions<TenancyOptions> options) : ITenantResolver
@@ -59,7 +59,7 @@ public sealed class TenantResolver(AppDbContext db, IMemoryCache cache, IOptions
         return await FindAsync("domain:" + domain, t => t.CustomDomain == domain, ct);
     }
 
-    public Task<TenantInfo?> GetByIdAsync(Guid tenantId, CancellationToken ct = default) =>
+    public Task<TenantInfo?> GetByIdAsync(int tenantId, CancellationToken ct = default) =>
         FindAsync("id:" + tenantId, t => t.Id == tenantId, ct);
 
     private async Task<TenantInfo?> FindAsync(string cacheKey, System.Linq.Expressions.Expression<Func<Tenant, bool>> predicate, CancellationToken ct)

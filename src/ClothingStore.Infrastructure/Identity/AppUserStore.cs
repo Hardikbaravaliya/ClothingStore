@@ -9,10 +9,10 @@ namespace ClothingStore.Infrastructure.Identity;
 /// <summary>
 /// Users are tenant-filtered (FindByEmail/FindByName only see the current tenant's users).
 /// FindById is the exception when no tenant is set yet: the cookie security-stamp check runs
-/// before the tenant middleware, and a Guid id cannot collide across tenants.
+/// before the tenant middleware, and an identity id is unique across all tenants.
 /// </summary>
 public class AppUserStore(AppDbContext context, ITenantProvider tenantProvider, IdentityErrorDescriber? describer = null)
-    : UserStore<ApplicationUser, ApplicationRole, AppDbContext, Guid>(context, describer)
+    : UserStore<ApplicationUser, ApplicationRole, AppDbContext, int>(context, describer)
 {
     public override Task<ApplicationUser?> FindByIdAsync(string userId, CancellationToken cancellationToken = default)
     {

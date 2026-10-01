@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 
 public class Shipment : TenantEntity
 {
-    public Guid OrderId { get; set; }
+    public int OrderId { get; set; }
     public Order Order { get; set; } = default!;
 
     /// <summary>"Shiprocket" or "Fake".</summary>
@@ -30,7 +30,7 @@ public class Shipment : TenantEntity
 
 public class ShipmentTrackingLog : TenantEntity
 {
-    public Guid ShipmentId { get; set; }
+    public int ShipmentId { get; set; }
     public Shipment Shipment { get; set; } = default!;
 
     /// <summary>Raw status text from the courier.</summary>

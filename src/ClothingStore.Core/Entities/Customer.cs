@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 /// <summary>Customer profile of one store. Login lives in AspNetUsers (UserId).</summary>
 public class Customer : TenantEntity
 {
-    public Guid UserId { get; set; }
+    public int UserId { get; set; }
 
     public string FullName { get; set; } = default!;
     public string Email { get; set; } = default!;
@@ -18,7 +18,7 @@ public class Customer : TenantEntity
 
 public class Address : TenantEntity
 {
-    public Guid CustomerId { get; set; }
+    public int CustomerId { get; set; }
     public Customer Customer { get; set; } = default!;
 
     public string FullName { get; set; } = default!;

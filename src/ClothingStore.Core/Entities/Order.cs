@@ -7,7 +7,7 @@ public class Order : TenantEntity
 {
     public string OrderNo { get; set; } = default!;
 
-    public Guid CustomerId { get; set; }
+    public int CustomerId { get; set; }
     public Customer Customer { get; set; } = default!;
 
     public OrderStatus Status { get; set; } = OrderStatus.Pending;
@@ -49,10 +49,10 @@ public class Order : TenantEntity
 
 public class OrderItem : TenantEntity
 {
-    public Guid OrderId { get; set; }
+    public int OrderId { get; set; }
     public Order Order { get; set; } = default!;
 
-    public Guid ProductVariantId { get; set; }
+    public int ProductVariantId { get; set; }
     public ProductVariant ProductVariant { get; set; } = default!;
 
     // Snapshot, so later product edits don't change old orders

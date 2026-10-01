@@ -5,7 +5,7 @@ namespace ClothingStore.Core.Entities;
 public class Cart : TenantEntity
 {
     /// <summary>null for a guest cart (identified by SessionKey).</summary>
-    public Guid? CustomerId { get; set; }
+    public int? CustomerId { get; set; }
     public Customer? Customer { get; set; }
 
     public string? SessionKey { get; set; }
@@ -15,10 +15,10 @@ public class Cart : TenantEntity
 
 public class CartItem : TenantEntity
 {
-    public Guid CartId { get; set; }
+    public int CartId { get; set; }
     public Cart Cart { get; set; } = default!;
 
-    public Guid ProductVariantId { get; set; }
+    public int ProductVariantId { get; set; }
     public ProductVariant ProductVariant { get; set; } = default!;
 
     public int Quantity { get; set; }

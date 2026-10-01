@@ -127,7 +127,7 @@ public static class DbSeeder
 
     private static async Task EnsureUserAsync(
         UserManager<ApplicationUser> userManager, ILogger logger,
-        Guid? tenantId, string email, string password, string fullName, string role)
+        int? tenantId, string email, string password, string fullName, string role)
     {
         // FindByEmail is tenant-filtered: the caller must have set the tenant first
         if (await userManager.FindByEmailAsync(email) is not null)

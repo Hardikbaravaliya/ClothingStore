@@ -5,7 +5,7 @@ namespace ClothingStore.Infrastructure.Tenancy;
 /// <summary>Scoped: one per request.</summary>
 public sealed class TenantProvider : ITenantProvider
 {
-    public Guid? TenantId { get; private set; }
+    public int? TenantId { get; private set; }
 
-    public void SetTenant(Guid? tenantId) => TenantId = tenantId;
+    public void SetTenant(int? tenantId) => TenantId = tenantId;
 }

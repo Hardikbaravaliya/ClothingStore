@@ -92,7 +92,7 @@ shop owners (tenants) potano alag store chalavi shake. Darek tenant no data **Te
 
 ### Implementation
 - `ITenantProvider` (scoped) → current `TenantId` aape. Middleware request ni sharuaat ma set kare.
-- `ITenantEntity` interface → `Guid TenantId { get; set; }`
+- `ITenantEntity` interface → `int TenantId { get; set; }`
 - **EF Core Global Query Filter**: darek `ITenantEntity` par `e => e.TenantId == currentTenantId`.
   Etle developer bhuli jay to pan bija tenant no data na aave.
 - **SaveChanges override**: navi entity par `TenantId` aapoaap set thay. Bija tenant nu `TenantId` hoy to exception.
@@ -250,7 +250,7 @@ ClothingStore.sln
 
 ## 7. Database tables
 
-> **Badha business tables ma `TenantId` (Guid, NOT NULL, FK → Tenants)** che. Platform tables
+> **Badha business tables ma `TenantId` (int, NOT NULL, FK → Tenants)** che. Platform tables
 > (Tenants, SubscriptionPlans vagere) mate juo Section 4.
 
 | Table | Kaam |
@@ -465,6 +465,9 @@ Live jati vakhte **fakt config badlay, code nahi.**
 ## 16. Changelog
 
 > Navo change aave to **upar** navi line add karo: `YYYY-MM-DD – shu badlayu`
+
+- **2026-10-01** – Badha tables na **Id ane FK `Guid` mathi `int` (identity)** karya, Identity users/roles pan `int`.
+  `InitialCreate` migration fari banavi (haju koi live data nathi). Public URL ma order mate `OrderNo` vaparvo, Id nahi.
 
 - **2026-10-01** – **Phase 1 puro.** Solution (6 projects + tests), badha tables, `InitialCreate` migration, Identity,
   tenant query filter ane SaveChanges rules, Api `X-Tenant`/subdomain resolution, Manager login.

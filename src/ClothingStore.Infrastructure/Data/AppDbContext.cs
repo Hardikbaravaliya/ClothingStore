@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 namespace ClothingStore.Infrastructure.Data;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvider tenantProvider)
-    : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>(options)
+    : IdentityDbContext<ApplicationUser, ApplicationRole, int>(options)
 {
     // Platform tables (no tenant filter)
     public DbSet<Tenant> Tenants => Set<Tenant>();
@@ -40,7 +40,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvide
     public DbSet<Coupon> Coupons => Set<Coupon>();
 
     /// <summary>Read by the global query filters on every query (EF parameterizes it).</summary>
-    public Guid? CurrentTenantId => tenantProvider.TenantId;
+    public int? CurrentTenantId => tenantProvider.TenantId;
 
     protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
     {
@@ -129,7 +129,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvide
             switch (entry.State)
             {
                 case EntityState.Added:
-                    if (tenantEntity.TenantId == Guid.Empty)
+                    if (tenantEntity.TenantId == 0)
                         tenantEntity.TenantId = currentTenantId.Value;
                     else if (tenantEntity.TenantId != currentTenantId)
                         throw new TenantMismatchException(
@@ -138,7 +138,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options, ITenantProvide
 
                 case EntityState.Modified:
                 case EntityState.Deleted:
-                    var originalTenantId = (Guid)entry.OriginalValues[nameof(ITenantEntity.TenantId)]!;
+                    var originalTenantId = (int)entry.OriginalValues[nameof(ITenantEntity.TenantId)]!;
                     if (originalTenantId != currentTenantId || tenantEntity.TenantId != currentTenantId)
                         throw new TenantMismatchException(
                             $"Cannot change {entry.Entity.GetType().Name} of another tenant.");

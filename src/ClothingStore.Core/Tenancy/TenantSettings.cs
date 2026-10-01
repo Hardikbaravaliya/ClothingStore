@@ -3,7 +3,7 @@ namespace ClothingStore.Core.Tenancy;
 /// <summary>Platform table, one row per tenant (PK = TenantId).</summary>
 public class TenantSettings
 {
-    public Guid TenantId { get; set; }
+    public int TenantId { get; set; }
     public Tenant Tenant { get; set; } = default!;
 
     // Store branding / contact

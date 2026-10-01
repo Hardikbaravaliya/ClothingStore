@@ -17,8 +17,8 @@ public sealed class TenantIsolationTests : IAsyncLifetime
     private readonly string _connectionString =
         $@"Server=(localdb)\MSSQLLocalDB;Database=ClothingStore_Tests_{Guid.NewGuid():N};Trusted_Connection=True;TrustServerCertificate=True";
 
-    private Guid _tenantA;
-    private Guid _tenantB;
+    private int _tenantA;
+    private int _tenantB;
 
     public async Task InitializeAsync()
     {
@@ -67,7 +67,7 @@ public sealed class TenantIsolationTests : IAsyncLifetime
     [Fact]
     public async Task Find_by_id_of_other_tenant_row_returns_null()
     {
-        Guid tenantBCategoryId;
+        int tenantBCategoryId;
         await using (var dbB = CreateContext(_tenantB))
             tenantBCategoryId = (await dbB.Categories.SingleAsync()).Id;
 
@@ -138,7 +138,7 @@ public sealed class TenantIsolationTests : IAsyncLifetime
         await Assert.ThrowsAsync<DbUpdateException>(() => dbA.SaveChangesAsync());
     }
 
-    private AppDbContext CreateContext(Guid? tenantId)
+    private AppDbContext CreateContext(int? tenantId)
     {
         var options = new DbContextOptionsBuilder<AppDbContext>();
         Infrastructure.DependencyInjection.ConfigureDbContext(options, _connectionString);
@@ -148,7 +148,7 @@ public sealed class TenantIsolationTests : IAsyncLifetime
         return new AppDbContext(options.Options, tenantProvider);
     }
 
-    private static ApplicationUser NewUser(Guid tenantId, string email) => new()
+    private static ApplicationUser NewUser(int tenantId, string email) => new()
     {
         TenantId = tenantId,
         UserName = email,

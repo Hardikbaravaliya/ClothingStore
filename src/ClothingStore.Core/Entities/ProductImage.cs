@@ -4,7 +4,7 @@ namespace ClothingStore.Core.Entities;
 
 public class ProductImage : TenantEntity
 {
-    public Guid ProductId { get; set; }
+    public int ProductId { get; set; }
     public Product Product { get; set; } = default!;
 
     /// <summary>Relative path, e.g. "{TenantId}/{ProductId}/abc.jpg". URL = Storage BaseUrl + Path.</summary>

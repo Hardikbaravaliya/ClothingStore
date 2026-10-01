@@ -6,7 +6,7 @@ namespace ClothingStore.Core.Tenancy;
 /// </summary>
 public interface ITenantProvider
 {
-    Guid? TenantId { get; }
+    int? TenantId { get; }
 
-    void SetTenant(Guid? tenantId);
+    void SetTenant(int? tenantId);
 }
