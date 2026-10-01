@@ -1,0 +1,69 @@
+@model IReadOnlyList<CategoryListItem>
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Categories</h1>
+    <a asp-action="Create" class="btn btn-primary">Add category</a>
+</div>
+
+@if (Model.Count == 0)
+{
+    <div class="alert alert-info">No categories yet. Start with "Girls Wear" and "Boys Wear".</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Slug</th>
+                    <th class="text-end">Products</th>
+                    <th class="text-end">Sort</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr class="@(c.IsTopLevel ? "table-light fw-semibold" : "")">
+                        <td>
+                            @if (!c.IsTopLevel)
+                            {
+                                <span class="text-muted ms-3 me-1">↳</span>
+                            }
+                            @c.Name
+                        </td>
+                        <td class="text-muted small">@c.Slug</td>
+                        <td class="text-end">@c.ProductCount</td>
+                        <td class="text-end">@c.SortOrder</td>
+                        <td>
+                            @if (c.IsActive)
+                            {
+                                <span class="badge text-bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end text-nowrap">
+                            @if (c.IsTopLevel)
+                            {
+                                <a asp-action="Create" asp-route-parentId="@c.Id" class="btn btn-sm btn-outline-primary">Add sub-category</a>
+                            }
+                            <a asp-action="Edit" asp-route-id="@c.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <form asp-action="Delete" asp-route-id="@c.Id" method="post" class="d-inline"
+                                  data-confirm="Delete category @c.Name?">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

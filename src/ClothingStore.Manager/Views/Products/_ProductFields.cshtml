@@ -1,0 +1,68 @@
+@model ProductForm
+@* Shared by Create and Edit. Edit renders it with for="Form", so inputs are named "Form.Name" etc. *@
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <label asp-for="Name" class="form-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="CategoryId" class="form-label"></label>
+        <select asp-for="CategoryId" asp-items="ViewBag.Categories" class="form-select">
+            <option value="">— Select —</option>
+        </select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="Mrp" class="form-label"></label>
+        <input asp-for="Mrp" class="form-control" step="0.01" />
+        <span asp-validation-for="Mrp" class="text-danger"></span>
+    </div>
+    <div class="col-md-3">
+        <label asp-for="SellingPrice" class="form-label"></label>
+        <input asp-for="SellingPrice" class="form-control" step="0.01" />
+        <div class="form-text">Default price for new variants.</div>
+        <span asp-validation-for="SellingPrice" class="text-danger"></span>
+    </div>
+    <div class="col-md-2">
+        <label asp-for="Brand" class="form-label"></label>
+        <input asp-for="Brand" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="Fabric" class="form-label"></label>
+        <input asp-for="Fabric" class="form-control" placeholder="Cotton" />
+    </div>
+    <div class="col-md-2">
+        <label asp-for="AgeGroup" class="form-label"></label>
+        <input asp-for="AgeGroup" class="form-control" placeholder="2-8 Years" />
+    </div>
+    <div class="col-12">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="Slug" class="form-label"></label>
+        <input asp-for="Slug" class="form-control" placeholder="Auto from name" />
+        <span asp-validation-for="Slug" class="text-danger"></span>
+    </div>
+    <div class="col-md-4">
+        <label asp-for="MetaTitle" class="form-label"></label>
+        <input asp-for="MetaTitle" class="form-control" />
+    </div>
+    <div class="col-md-4">
+        <label asp-for="MetaDescription" class="form-label"></label>
+        <input asp-for="MetaDescription" class="form-control" />
+    </div>
+    <div class="col-12 d-flex gap-4">
+        <div class="form-check">
+            <input asp-for="IsActive" class="form-check-input" />
+            <label asp-for="IsActive" class="form-check-label"></label>
+        </div>
+        <div class="form-check">
+            <input asp-for="IsFeatured" class="form-check-input" />
+            <label asp-for="IsFeatured" class="form-check-label"></label>
+        </div>
+    </div>
+</div>

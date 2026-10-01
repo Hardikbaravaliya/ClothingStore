@@ -216,12 +216,12 @@ ClothingStore.sln
 ### 6.1 Manager (Admin – darek tenant nu)
 - [ ] Login ane roles (SuperAdmin, TenantAdmin, Manager)
 - [ ] Store settings: name, logo, GST, **TimeZone, Currency (code, symbol, culture)**, Razorpay keys, Shiprocket keys
-- [ ] Category / Sub-category (Girls Wear, Boys Wear → Frock, T-Shirt, Jeans ...)
-- [ ] Product: name, description, brand, fabric, age group, MRP, selling price, badhi images
-- [ ] Variants: Size + Color + SKU + stock
-- [ ] Supplier management (name, contact, GST, address)
-- [ ] Purchase entry: supplier, date, items, qty, cost price → stock aapoaap plus
-- [ ] Stock view, low-stock alert, stock ledger
+- [x] Category / Sub-category (Girls Wear, Boys Wear → Frock, T-Shirt, Jeans ...)
+- [x] Product: name, description, brand, fabric, age group, MRP, selling price, badhi images
+- [x] Variants: Size + Color + SKU + stock
+- [x] Supplier management (name, contact, GST, address)
+- [x] Purchase entry: supplier, date, items, qty, cost price → stock aapoaap plus
+- [x] Stock view, low-stock alert, stock ledger
 - [ ] Orders: confirm, pack, ship, deliver, cancel, return
 - [ ] Shiprocket: shipment create, AWB, label print
 - [ ] Reports dashboard
@@ -445,7 +445,7 @@ Live jati vakhte **fakt config badlay, code nahi.**
 | Phase | Kaam | Status |
 |---|---|---|
 | 1 | Solution setup, Core, Infrastructure, **Multi-tenancy (Tenants, TenantId, query filter, middleware)**, DB tables, Identity, Migrations | ✅ Done |
-| 2 | Manager: Category, Product, Variants, Images, Supplier, Purchase, Stock | ⏳ Pending |
+| 2 | Manager: Category, Product, Variants, Images, Supplier, Purchase, Stock | ✅ Done |
 | 3 | Api + Catalog: Product list/detail, filter, cart, checkout, payment, order | ⏳ Pending |
 | 4 | Manager: Order management + Shiprocket; Catalog: tracking page | ⏳ Pending |
 | 5 | Reports dashboard + Excel/PDF export | ⏳ Pending |
@@ -465,6 +465,17 @@ Live jati vakhte **fakt config badlay, code nahi.**
 ## 16. Changelog
 
 > Navo change aave to **upar** navi line add karo: `YYYY-MM-DD – shu badlayu`
+
+- **2026-10-01** – **Phase 2 puro.** Manager ma Categories (2 level), Products, Variants, Images, Suppliers, Purchases ane Stock (list, low-stock, ledger, adjust).
+  Nakki karela nirnayo:
+  - **Variants ek sathe:** sizes ane colors comma thi lakho, darek Size × Color no variant bane. SKU aapoaap (`{ProductId}-{Size}-{Color}`), pachhi edit thai shake.
+  - **Stock fakt Purchase ke Stock Adjust thi j badlay** (variant edit ma stock field nathi). Darek badlav no ledger row.
+  - `StockTransactions.Quantity` have **signed** chhe (+ aave, − jay), jethi Adjust ma direction dekhay.
+  - **Saved purchase edit/delete nathi thati.** Bhul hoy to Stock page par adjust. (Purchase return pachhi jarur pade to umersu.)
+  - Purchase save ek DB transaction ma; RowVersion conflict par 3 var retry.
+  - Images: JPG/PNG/WEBP fakt (file na andar na bytes thi check), 5 MB, product dith 10. Path `{TenantId}/{ProductId}/{guid}.ext`.
+  - Product/variant/supplier no history (stock, purchase, order) hoy to delete nahi; **Inactive** karvo.
+  - `ITenantClock` ane `IMoneyFormatter` umerya (Section 4). Store pages fakt TenantAdmin/Manager mate; Super Admin ne nathi dekhata.
 
 - **2026-10-01** – Badha tables na **Id ane FK `Guid` mathi `int` (identity)** karya, Identity users/roles pan `int`.
   `InitialCreate` migration fari banavi (haju koi live data nathi). Public URL ma order mate `OrderNo` vaparvo, Id nahi.

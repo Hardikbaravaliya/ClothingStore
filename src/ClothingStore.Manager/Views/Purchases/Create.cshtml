@@ -1,0 +1,167 @@
+@model PurchaseForm
+@{
+    ViewData["Title"] = "New purchase";
+    var variants = (IReadOnlyList<VariantOption>)ViewBag.Variants;
+}
+
+<a asp-action="Index" class="small">← Purchases</a>
+<h1 class="h3 mb-3">New purchase</h1>
+
+@if (variants.Count == 0)
+{
+    <div class="alert alert-warning">
+        No active product variants yet. <a asp-controller="Products" asp-action="Index">Add products with sizes/colors</a> first.
+    </div>
+}
+
+<form asp-action="Create" method="post" id="purchase-form">
+    <div asp-validation-summary="All" class="alert alert-danger py-2" role="alert"></div>
+
+    <div class="card mb-3">
+        <div class="card-body row g-3">
+            <div class="col-md-4">
+                <label asp-for="SupplierId" class="form-label"></label>
+                <select asp-for="SupplierId" asp-items="ViewBag.Suppliers" class="form-select">
+                    <option value="">— Select —</option>
+                </select>
+                <div class="form-text"><a asp-controller="Suppliers" asp-action="Create">Add a new supplier</a></div>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="PurchaseDate" class="form-label"></label>
+                <input asp-for="PurchaseDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label asp-for="InvoiceNo" class="form-label"></label>
+                <input asp-for="InvoiceNo" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label asp-for="TaxAmount" class="form-label"></label>
+                <input asp-for="TaxAmount" class="form-control js-tax" step="0.01" min="0" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-3">
+        <div class="card-header fw-semibold">Items</div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table align-middle mb-2">
+                    <thead>
+                        <tr>
+                            <th style="min-width:320px">Product variant</th>
+                            <th style="width:120px">Qty</th>
+                            <th style="width:150px">Cost price</th>
+                            <th class="text-end" style="width:150px">Line total</th>
+                            <th style="width:50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="item-rows">
+                        @for (var i = 0; i < Model.Items.Count; i++)
+                        {
+                            var item = Model.Items[i];
+                            <tr class="js-item">
+                                <td>
+                                    <select name="Items[@i].ProductVariantId" class="form-select js-variant" required>
+                                        <option value="">— Select —</option>
+                                        @foreach (var v in variants)
+                                        {
+                                            <option value="@v.Id" data-cost="@v.LastCost.ToString(System.Globalization.CultureInfo.InvariantCulture)" selected="@(v.Id == item.ProductVariantId)">@v.DisplayName</option>
+                                        }
+                                    </select>
+                                </td>
+                                <td><input name="Items[@i].Quantity" value="@(item.Quantity == 0 ? "" : item.Quantity)" type="number" min="1" class="form-control js-qty" required /></td>
+                                <td><input name="Items[@i].CostPrice" value="@(item.CostPrice == 0 ? "" : item.CostPrice.ToString(System.Globalization.CultureInfo.InvariantCulture))" type="number" min="0.01" step="0.01" class="form-control js-cost" required /></td>
+                                <td class="text-end js-line-total"></td>
+                                <td><button type="button" class="btn btn-sm btn-outline-danger js-remove" aria-label="Remove row">×</button></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-primary" id="add-row">+ Add item</button>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <label asp-for="Notes" class="form-label"></label>
+            <textarea asp-for="Notes" class="form-control" rows="2"></textarea>
+        </div>
+        <div class="col-md-6">
+            <table class="table table-sm mt-3 mt-md-0">
+                <tr><td class="text-end">Sub total</td><td class="text-end" style="width:160px" id="sub-total">0.00</td></tr>
+                <tr><td class="text-end">Tax</td><td class="text-end" id="tax-total">0.00</td></tr>
+                <tr class="fw-semibold"><td class="text-end">Total</td><td class="text-end" id="grand-total">0.00</td></tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+        <button type="submit" class="btn btn-primary">Save purchase</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            var rows = document.getElementById('item-rows');
+            var template = rows.querySelector('.js-item').cloneNode(true);
+
+            function money(n) { return n.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+
+            function recalc() {
+                var sub = 0;
+                rows.querySelectorAll('.js-item').forEach(function (row) {
+                    var qty = parseFloat(row.querySelector('.js-qty').value) || 0;
+                    var cost = parseFloat(row.querySelector('.js-cost').value) || 0;
+                    row.querySelector('.js-line-total').textContent = money(qty * cost);
+                    sub += qty * cost;
+                });
+                var tax = parseFloat(document.querySelector('.js-tax').value) || 0;
+                document.getElementById('sub-total').textContent = money(sub);
+                document.getElementById('tax-total').textContent = money(tax);
+                document.getElementById('grand-total').textContent = money(sub + tax);
+            }
+
+            // Keep names as Items[0], Items[1] ... so model binding gets every row
+            function reindex() {
+                rows.querySelectorAll('.js-item').forEach(function (row, i) {
+                    row.querySelectorAll('[name]').forEach(function (el) {
+                        el.name = el.name.replace(/Items\[\d+\]/, 'Items[' + i + ']');
+                    });
+                });
+            }
+
+            document.getElementById('add-row').addEventListener('click', function () {
+                var row = template.cloneNode(true);
+                row.querySelectorAll('input').forEach(function (el) { el.value = ''; });
+                row.querySelector('select').selectedIndex = 0;
+                rows.appendChild(row);
+                reindex();
+                recalc();
+            });
+
+            rows.addEventListener('click', function (e) {
+                if (!e.target.classList.contains('js-remove')) return;
+                if (rows.querySelectorAll('.js-item').length === 1) return;
+                e.target.closest('.js-item').remove();
+                reindex();
+                recalc();
+            });
+
+            rows.addEventListener('change', function (e) {
+                if (e.target.classList.contains('js-variant')) {
+                    var cost = e.target.selectedOptions[0] && e.target.selectedOptions[0].dataset.cost;
+                    var costInput = e.target.closest('.js-item').querySelector('.js-cost');
+                    if (cost && parseFloat(cost) > 0 && !costInput.value) costInput.value = cost;
+                }
+                recalc();
+            });
+            rows.addEventListener('input', recalc);
+            document.querySelector('.js-tax').addEventListener('input', recalc);
+
+            recalc();
+        })();
+    </script>
+}

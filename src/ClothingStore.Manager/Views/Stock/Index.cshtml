@@ -1,0 +1,75 @@
+@model PagedList<StockListItem>
+@{
+    ViewData["Title"] = "Stock";
+    var query = (StockQuery)ViewBag.Query;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Stock</h1>
+    <a asp-controller="Purchases" asp-action="Create" class="btn btn-primary">New purchase</a>
+</div>
+
+<form method="get" class="row g-2 mb-3 align-items-center">
+    <div class="col-sm-5">
+        <input name="search" value="@query.Search" class="form-control" placeholder="Search product or SKU" />
+    </div>
+    <div class="col-sm-3">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="lowStockOnly" value="true" id="lowStockOnly" checked="@query.LowStockOnly" />
+            <label class="form-check-label" for="lowStockOnly">Low stock only</label>
+        </div>
+    </div>
+    <div class="col-sm-4 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (Model.TotalCount == 0)
+{
+    <div class="alert alert-info">@(query.LowStockOnly ? "No low-stock items." : "No variants found.")</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Size / Color</th>
+                    <th>SKU</th>
+                    <th class="text-end">Stock</th>
+                    <th class="text-end">Alert at</th>
+                    <th class="text-end">Avg cost</th>
+                    <th class="text-end">Stock value</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Items)
+                {
+                    <tr class="@(!s.IsActive ? "text-muted" : "")">
+                        <td><a asp-controller="Products" asp-action="Edit" asp-route-id="@s.ProductId">@s.ProductName</a></td>
+                        <td>@s.Size / @s.Color</td>
+                        <td class="small">@s.Sku</td>
+                        <td class="text-end">
+                            @if (s.IsLowStock && s.IsActive)
+                            {
+                                <span class="badge text-bg-warning">@s.StockQty</span>
+                            }
+                            else
+                            {
+                                @s.StockQty
+                            }
+                        </td>
+                        <td class="text-end text-muted">@s.LowStockThreshold</td>
+                        <td class="text-end">@Money.Format(s.AvgCostPrice)</td>
+                        <td class="text-end">@Money.Format(s.StockValue)</td>
+                        <td class="text-end"><a asp-action="Ledger" asp-route-id="@s.VariantId" class="btn btn-sm btn-outline-secondary">Ledger</a></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Pager" model="Model" />
+}

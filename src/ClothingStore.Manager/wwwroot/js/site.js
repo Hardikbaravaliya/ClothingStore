@@ -1,4 +1,7 @@
-﻿// Please see documentation at https://learn.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+// <form data-confirm="Delete X?"> asks before submitting (text stays out of inline JS).
+document.addEventListener('submit', function (e) {
+    var message = e.target.getAttribute && e.target.getAttribute('data-confirm');
+    if (message && !window.confirm(message)) {
+        e.preventDefault();
+    }
+});

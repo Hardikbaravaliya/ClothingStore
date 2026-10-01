@@ -10,8 +10,13 @@
     <link rel="stylesheet" href="~/ClothingStore.Manager.styles.css" asp-append-version="true" />
 </head>
 <body>
+    @{
+        var isStoreStaff = User.HasClaim(c => c.Type == AppClaimTypes.TenantId);
+        var controller = ViewContext.RouteData.Values["controller"]?.ToString();
+        string Active(string name) => controller == name ? "active" : "";
+    }
     <header>
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark mb-3">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-controller="Home" asp-action="Index">ClothingStore Manager</a>
                 @if (User.Identity?.IsAuthenticated == true)
@@ -20,11 +25,17 @@
                             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <div class="navbar-collapse collapse justify-content-between">
                         <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Home" asp-action="Index">Dashboard</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link @Active("Home")" asp-controller="Home" asp-action="Index">Dashboard</a></li>
+                            @if (isStoreStaff)
+                            {
+                                <li class="nav-item"><a class="nav-link @Active("Categories")" asp-controller="Categories" asp-action="Index">Categories</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("Products")" asp-controller="Products" asp-action="Index">Products</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("Suppliers")" asp-controller="Suppliers" asp-action="Index">Suppliers</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("Purchases")" asp-controller="Purchases" asp-action="Index">Purchases</a></li>
+                                <li class="nav-item"><a class="nav-link @Active("Stock")" asp-controller="Stock" asp-action="Index">Stock</a></li>
+                            }
                         </ul>
                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-flex align-items-center gap-2">
                             <span class="navbar-text small">@User.Identity.Name</span>
@@ -35,8 +46,22 @@
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div class="container-xl">
+        <main role="main" class="pb-4">
+            @if (TempData["Success"] is string success)
+            {
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    @success
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
+            @if (TempData["Error"] is string error)
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    @error
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            }
             @RenderBody()
         </main>
     </div>

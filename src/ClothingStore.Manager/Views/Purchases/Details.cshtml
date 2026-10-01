@@ -1,0 +1,64 @@
+@model PurchaseDetail
+@{
+    ViewData["Title"] = "Purchase";
+}
+
+<a asp-action="Index" class="small">← Purchases</a>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Purchase #@Model.Id</h1>
+    <a asp-action="Create" asp-route-supplierId="@Model.SupplierId" class="btn btn-outline-primary btn-sm">New purchase from this supplier</a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <dl class="row mb-0">
+            <dt class="col-sm-3">Supplier</dt>
+            <dd class="col-sm-9"><a asp-controller="Suppliers" asp-action="Edit" asp-route-id="@Model.SupplierId">@Model.SupplierName</a></dd>
+            <dt class="col-sm-3">Purchase date</dt>
+            <dd class="col-sm-9">@Clock.ToLocal(Model.PurchaseDate).ToString("dd-MM-yyyy")</dd>
+            <dt class="col-sm-3">Invoice no</dt>
+            <dd class="col-sm-9">@(Model.InvoiceNo ?? "—")</dd>
+            <dt class="col-sm-3">Entered on</dt>
+            <dd class="col-sm-9">@Clock.ToLocal(Model.CreatedAt).ToString("dd-MM-yyyy HH:mm")</dd>
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <dt class="col-sm-3">Notes</dt>
+                <dd class="col-sm-9">@Model.Notes</dd>
+            }
+        </dl>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table align-middle">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Size / Color</th>
+                <th>SKU</th>
+                <th class="text-end">Qty</th>
+                <th class="text-end">Cost price</th>
+                <th class="text-end">Line total</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var line in Model.Lines)
+            {
+                <tr>
+                    <td>@line.ProductName</td>
+                    <td>@line.Size / @line.Color</td>
+                    <td class="small">@line.Sku</td>
+                    <td class="text-end">@line.Quantity</td>
+                    <td class="text-end">@Money.Format(line.CostPrice)</td>
+                    <td class="text-end">@Money.Format(line.LineTotal)</td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr><td colspan="5" class="text-end">Sub total</td><td class="text-end">@Money.Format(Model.SubTotal)</td></tr>
+            <tr><td colspan="5" class="text-end">Tax</td><td class="text-end">@Money.Format(Model.TaxAmount)</td></tr>
+            <tr class="fw-semibold"><td colspan="5" class="text-end">Total</td><td class="text-end">@Money.Format(Model.TotalAmount)</td></tr>
+        </tfoot>
+    </table>
+</div>
+<p class="text-muted small">Saved purchases cannot be edited. To correct stock, use a stock adjustment on the Stock page.</p>

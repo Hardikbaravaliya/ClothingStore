@@ -1,5 +1,6 @@
 using ClothingStore.Core.Tenancy;
 using ClothingStore.Infrastructure.Data;
+using ClothingStore.Infrastructure.Storage;
 using ClothingStore.Infrastructure.Tenancy;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -21,6 +22,8 @@ public static class DependencyInjection
         services.Configure<TenancyOptions>(configuration.GetSection(TenancyOptions.SectionName));
         services.AddScoped<ITenantProvider, TenantProvider>();
         services.AddScoped<ITenantResolver, TenantResolver>();
+
+        services.AddImageStorage(configuration);
 
         return services;
     }

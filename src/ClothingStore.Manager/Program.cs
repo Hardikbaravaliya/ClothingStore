@@ -2,7 +2,9 @@ using ClothingStore.Core.Common;
 using ClothingStore.Infrastructure;
 using ClothingStore.Infrastructure.Data.Seed;
 using ClothingStore.Infrastructure.Identity;
+using ClothingStore.Infrastructure.Storage;
 using ClothingStore.Infrastructure.Tenancy;
+using ClothingStore.Manager;
 using ClothingStore.Services;
 using Microsoft.AspNetCore.Authorization;
 
@@ -26,10 +28,18 @@ builder.Services.ConfigureApplicationCookie(o =>
     o.SlidingExpiration = true;
 });
 
-// Every page needs a staff login unless marked [AllowAnonymous]
-builder.Services.AddAuthorization(o => o.FallbackPolicy = new AuthorizationPolicyBuilder()
-    .RequireRole(AppRoles.Staff)
-    .Build());
+builder.Services.AddAuthorization(o =>
+{
+    // Every page needs a staff login unless marked [AllowAnonymous]
+    o.FallbackPolicy = new AuthorizationPolicyBuilder()
+        .RequireRole(AppRoles.Staff)
+        .Build();
+
+    // Store pages (products, stock ...) need a store: SuperAdmin has none
+    o.AddPolicy(Policies.StoreStaff, p => p
+        .RequireRole(AppRoles.TenantAdmin, AppRoles.Manager)
+        .RequireClaim(AppClaimTypes.TenantId));
+});
 
 builder.Services.AddControllersWithViews();
 
@@ -46,6 +56,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseLocalImageFiles(); // /uploads (product images)
 app.UseRouting();
 
 app.UseAuthentication();

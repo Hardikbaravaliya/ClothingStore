@@ -1,0 +1,65 @@
+@model VariantForm
+@{
+    ViewData["Title"] = "Edit variant";
+}
+
+<a asp-action="Edit" asp-route-id="@Model.ProductId" class="small">← Back to product</a>
+<h1 class="h3 mb-3">Edit variant</h1>
+
+<div class="card">
+    <div class="card-body">
+        <form asp-action="EditVariant" asp-route-id="@Model.Id" method="post">
+            <input type="hidden" asp-for="ProductId" />
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+            <div class="row g-3">
+                <div class="col-md-4">
+                    <label asp-for="Size" class="form-label"></label>
+                    <input asp-for="Size" class="form-control" />
+                    <span asp-validation-for="Size" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Color" class="form-label"></label>
+                    <input asp-for="Color" class="form-control" />
+                    <span asp-validation-for="Color" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Sku" class="form-label"></label>
+                    <input asp-for="Sku" class="form-control" />
+                    <span asp-validation-for="Sku" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="SellingPrice" class="form-label"></label>
+                    <input asp-for="SellingPrice" class="form-control" step="0.01" />
+                    <span asp-validation-for="SellingPrice" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Mrp" class="form-label"></label>
+                    <input asp-for="Mrp" class="form-control" step="0.01" />
+                    <span asp-validation-for="Mrp" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="LowStockThreshold" class="form-label"></label>
+                    <input asp-for="LowStockThreshold" class="form-control" />
+                    <span asp-validation-for="LowStockThreshold" class="text-danger"></span>
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        <input asp-for="IsActive" class="form-check-input" />
+                        <label asp-for="IsActive" class="form-check-label"></label>
+                    </div>
+                    <div class="form-text">Stock is changed only by purchases or a stock adjustment (Stock page).</div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a asp-action="Edit" asp-route-id="@Model.ProductId" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

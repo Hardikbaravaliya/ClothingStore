@@ -1,0 +1,166 @@
+@model ProductDetail
+@{
+    ViewData["Title"] = Model.Form.Name;
+    var productId = Model.Form.Id;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <a asp-action="Index" class="small">← Products</a>
+        <h1 class="h3 mb-0">@Model.Form.Name</h1>
+        <span class="text-muted small">@Model.CategoryName</span>
+    </div>
+    <form asp-action="Delete" asp-route-id="@productId" method="post" data-confirm="Delete this product with all its variants and images?">
+        <button type="submit" class="btn btn-outline-danger btn-sm">Delete product</button>
+    </form>
+</div>
+
+@* ---- Details ---- *@
+<div class="card mb-4">
+    <div class="card-header fw-semibold">Details</div>
+    <div class="card-body">
+        <form asp-action="Edit" asp-route-id="@productId" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+            <partial name="_ProductFields" for="Form" />
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save details</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@* ---- Variants ---- *@
+<div class="card mb-4">
+    <div class="card-header fw-semibold">Sizes &amp; colors (variants)</div>
+    <div class="card-body">
+        @if (Model.Variants.Count == 0)
+        {
+            <p class="text-muted">No variants yet. Add sizes and colors below. Stock comes from purchases.</p>
+        }
+        else
+        {
+            <div class="table-responsive mb-3">
+                <table class="table table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Size</th>
+                            <th>Color</th>
+                            <th>SKU</th>
+                            <th class="text-end">Price</th>
+                            <th class="text-end">Stock</th>
+                            <th class="text-end">Avg cost</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var v in Model.Variants)
+                        {
+                            <tr>
+                                <td>@v.Size</td>
+                                <td>@v.Color</td>
+                                <td class="small">@v.Sku</td>
+                                <td class="text-end">@Money.Format(v.SellingPrice)</td>
+                                <td class="text-end">
+                                    <a asp-controller="Stock" asp-action="Ledger" asp-route-id="@v.Id" class="@(v.IsLowStock ? "text-danger fw-semibold" : "")">@v.StockQty</a>
+                                </td>
+                                <td class="text-end text-muted">@Money.Format(v.AvgCostPrice)</td>
+                                <td>
+                                    @if (!v.IsActive)
+                                    {
+                                        <span class="badge text-bg-secondary">Inactive</span>
+                                    }
+                                    else if (v.IsLowStock)
+                                    {
+                                        <span class="badge text-bg-warning">Low stock</span>
+                                    }
+                                </td>
+                                <td class="text-end text-nowrap">
+                                    <a asp-action="EditVariant" asp-route-id="@v.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                                    <form asp-action="DeleteVariant" asp-route-id="@v.Id" asp-route-productId="@productId" method="post" class="d-inline"
+                                          data-confirm="Delete variant @v.Size / @v.Color?">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <form asp-action="AddVariants" method="post" class="border rounded p-3 bg-light">
+            <input type="hidden" name="ProductId" value="@productId" />
+            <div class="fw-semibold mb-2">Add variants</div>
+            <div class="row g-2">
+                <div class="col-md-4">
+                    <label class="form-label small" for="Sizes">Sizes (comma separated)</label>
+                    <input id="Sizes" name="Sizes" class="form-control" placeholder="2-3Y, 3-4Y, 4-5Y" required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label small" for="Colors">Colors (comma separated)</label>
+                    <input id="Colors" name="Colors" class="form-control" placeholder="Red, Blue" required />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small" for="SellingPrice">Price</label>
+                    <input id="SellingPrice" name="SellingPrice" type="number" step="0.01" min="0.01" class="form-control" placeholder="@Model.Form.SellingPrice" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small" for="LowStockThreshold">Low stock at</label>
+                    <input id="LowStockThreshold" name="LowStockThreshold" type="number" min="0" value="5" class="form-control" />
+                </div>
+            </div>
+            <div class="form-text">Every size × color is created; existing ones are skipped. SKU is generated automatically.</div>
+            <button type="submit" class="btn btn-primary btn-sm mt-2">Add variants</button>
+        </form>
+    </div>
+</div>
+
+@* ---- Images ---- *@
+<div class="card mb-4">
+    <div class="card-header fw-semibold">Images</div>
+    <div class="card-body">
+        @if (Model.Images.Count == 0)
+        {
+            <p class="text-muted">No images yet.</p>
+        }
+        else
+        {
+            <div class="row g-3 mb-3">
+                @foreach (var img in Model.Images)
+                {
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <div class="card h-100 @(img.IsPrimary ? "border-primary" : "")">
+                            <img src="@img.Url" alt="" class="card-img-top" style="aspect-ratio:1;object-fit:cover" />
+                            <div class="card-body p-2 d-flex flex-wrap gap-1">
+                                @if (img.IsPrimary)
+                                {
+                                    <span class="badge text-bg-primary">Main</span>
+                                }
+                                else
+                                {
+                                    <form asp-action="SetPrimaryImage" asp-route-imageId="@img.Id" asp-route-productId="@productId" method="post">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary py-0">Make main</button>
+                                    </form>
+                                }
+                                <form asp-action="DeleteImage" asp-route-imageId="@img.Id" asp-route-productId="@productId" method="post" data-confirm="Delete this image?">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0">Delete</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+
+        <form asp-action="UploadImages" asp-route-id="@productId" method="post" enctype="multipart/form-data" class="d-flex flex-wrap gap-2 align-items-center">
+            <input type="file" name="files" multiple accept=".jpg,.jpeg,.png,.webp" class="form-control" style="max-width:400px" required />
+            <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+            <span class="form-text">JPG, PNG or WEBP, up to 5 MB each, max @ProductService.MaxImagesPerProduct images.</span>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -1,0 +1,83 @@
+@model PagedList<ProductListItem>
+@{
+    ViewData["Title"] = "Products";
+    var query = (ProductListQuery)ViewBag.Query;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Products</h1>
+    <a asp-action="Create" class="btn btn-primary">Add product</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-sm-5">
+        <input name="search" value="@query.Search" class="form-control" placeholder="Search name or SKU" />
+    </div>
+    <div class="col-sm-4">
+        <select name="categoryId" asp-items="ViewBag.Categories" class="form-select">
+            <option value="">All categories</option>
+        </select>
+    </div>
+    <div class="col-sm-3 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (Model.TotalCount == 0)
+{
+    <div class="alert alert-info">No products found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th style="width:64px"></th>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th class="text-end">MRP</th>
+                    <th class="text-end">Price</th>
+                    <th class="text-end">Variants</th>
+                    <th class="text-end">Stock</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Model.Items)
+                {
+                    <tr>
+                        <td>
+                            @if (p.PrimaryImageUrl is not null)
+                            {
+                                <img src="@p.PrimaryImageUrl" alt="" class="rounded" style="width:48px;height:48px;object-fit:cover" />
+                            }
+                            else
+                            {
+                                <div class="bg-light rounded" style="width:48px;height:48px"></div>
+                            }
+                        </td>
+                        <td><a asp-action="Edit" asp-route-id="@p.Id">@p.Name</a></td>
+                        <td>@p.CategoryName</td>
+                        <td class="text-end text-muted">@Money.Format(p.Mrp)</td>
+                        <td class="text-end">@Money.Format(p.SellingPrice)</td>
+                        <td class="text-end">@p.VariantCount</td>
+                        <td class="text-end">@p.TotalStock</td>
+                        <td>
+                            @if (p.IsActive)
+                            {
+                                <span class="badge text-bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">Inactive</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Pager" model="Model" />
+}

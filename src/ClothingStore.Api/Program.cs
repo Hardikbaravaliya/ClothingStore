@@ -1,4 +1,5 @@
 using ClothingStore.Infrastructure;
+using ClothingStore.Infrastructure.Storage;
 using ClothingStore.Infrastructure.Tenancy;
 using ClothingStore.Services;
 using Microsoft.OpenApi.Models;
@@ -42,6 +43,7 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseLocalImageFiles(); // /uploads (product images for the Catalog)
 // Phase 3: app.UseAuthentication() (customer JWT) goes here, before the tenant middleware
 app.UseMiddleware<ApiTenantMiddleware>();
 app.UseAuthorization();

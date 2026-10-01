@@ -1,9 +1,9 @@
-@model ClothingStore.Services.Store.StoreSettingsDto?
+@model StoreSettingsDto?
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<h1 class="h3 mb-4">Welcome, @User.FindFirst(ClothingStore.Core.Common.AppClaimTypes.FullName)?.Value</h1>
+<h1 class="h3 mb-4">Welcome, @User.FindFirst(AppClaimTypes.FullName)?.Value</h1>
 
 @if (Model is null)
 {
@@ -16,17 +16,32 @@
 }
 else
 {
-    <div class="card">
-        <div class="card-body">
-            <h2 class="h5">@Model.Name</h2>
-            <dl class="row mb-0">
-                <dt class="col-sm-3">Store code</dt>
-                <dd class="col-sm-9">@Model.Slug</dd>
-                <dt class="col-sm-3">Currency</dt>
-                <dd class="col-sm-9">@Model.CurrencyCode (@Model.CurrencySymbol)</dd>
-                <dt class="col-sm-3">Time zone</dt>
-                <dd class="col-sm-9">@Model.TimeZoneId</dd>
-            </dl>
+    var lowStock = (int)(ViewBag.LowStockCount ?? 0);
+
+    <div class="row g-3">
+        <div class="col-md-8">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h2 class="h5">@Model.Name</h2>
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4">Store code</dt>
+                        <dd class="col-sm-8">@Model.Slug</dd>
+                        <dt class="col-sm-4">Currency</dt>
+                        <dd class="col-sm-8">@Model.CurrencyCode (@Model.CurrencySymbol)</dd>
+                        <dt class="col-sm-4">Time zone</dt>
+                        <dd class="col-sm-8">@Model.TimeZoneId</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 @(lowStock > 0 ? "border-warning" : "")">
+                <div class="card-body">
+                    <div class="text-muted small">Low stock variants</div>
+                    <div class="display-6">@lowStock</div>
+                    <a asp-controller="Stock" asp-action="Index" asp-route-lowStockOnly="true">View low stock</a>
+                </div>
+            </div>
         </div>
     </div>
 }

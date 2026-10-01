@@ -11,7 +11,7 @@ public class StockTransaction : TenantEntity
 
     public StockTxnType Type { get; set; }
 
-    /// <summary>Always positive; direction comes from Type.</summary>
+    /// <summary>Signed change: + adds stock (In, Return, Adjust up), − removes it (Out, Adjust down).</summary>
     public int Quantity { get; set; }
 
     public int BalanceAfter { get; set; }

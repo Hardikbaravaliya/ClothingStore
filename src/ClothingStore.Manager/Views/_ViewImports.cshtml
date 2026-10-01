@@ -1,3 +1,10 @@
-﻿@using ClothingStore.Manager
+@using ClothingStore.Manager
 @using ClothingStore.Manager.Models
+@using ClothingStore.Core.Common
+@using ClothingStore.Services.Products
+@using ClothingStore.Services.Purchases
+@using ClothingStore.Services.Inventory
+@using ClothingStore.Services.Store
+@inject IMoneyFormatter Money
+@inject ITenantClock Clock
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers

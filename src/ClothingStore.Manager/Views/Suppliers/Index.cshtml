@@ -1,0 +1,74 @@
+@model PagedList<SupplierListItem>
+@{
+    ViewData["Title"] = "Suppliers";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">Suppliers</h1>
+    <a asp-action="Create" class="btn btn-primary">Add supplier</a>
+</div>
+
+<form method="get" class="row g-2 mb-3">
+    <div class="col-sm-6">
+        <input name="search" value="@ViewBag.Search" class="form-control" placeholder="Search name, phone or GST" />
+    </div>
+    <div class="col-sm-6 d-flex gap-2">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (Model.TotalCount == 0)
+{
+    <div class="alert alert-info">No suppliers found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Contact</th>
+                    <th>Phone</th>
+                    <th>City</th>
+                    <th>GST no</th>
+                    <th class="text-end">Purchases</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model.Items)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@s.Id">@s.Name</a></td>
+                        <td>@s.ContactPerson</td>
+                        <td>@s.Phone</td>
+                        <td>@s.City</td>
+                        <td class="small">@s.GstNo</td>
+                        <td class="text-end">
+                            <a asp-controller="Purchases" asp-action="Index" asp-route-supplierId="@s.Id">@s.PurchaseCount</a>
+                        </td>
+                        <td>
+                            @if (s.IsActive)
+                            {
+                                <span class="badge text-bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="Delete" asp-route-id="@s.Id" method="post" data-confirm="Delete supplier @s.Name?">
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <partial name="_Pager" model="Model" />
+}
