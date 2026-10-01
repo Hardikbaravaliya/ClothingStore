@@ -21,6 +21,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{0F815A91
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClothingStore.Services.Tests", "tests\ClothingStore.Services.Tests\ClothingStore.Services.Tests.csproj", "{24E9DDB3-C05D-4397-89AA-F92BA2C79B5A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClothingStore.Contracts", "src\ClothingStore.Contracts\ClothingStore.Contracts.csproj", "{6AC9FDA5-76BA-4351-BC0A-75484B144CC2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -58,6 +60,10 @@ Global
 		{24E9DDB3-C05D-4397-89AA-F92BA2C79B5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24E9DDB3-C05D-4397-89AA-F92BA2C79B5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24E9DDB3-C05D-4397-89AA-F92BA2C79B5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AC9FDA5-76BA-4351-BC0A-75484B144CC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AC9FDA5-76BA-4351-BC0A-75484B144CC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AC9FDA5-76BA-4351-BC0A-75484B144CC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AC9FDA5-76BA-4351-BC0A-75484B144CC2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{33A31C6E-8A76-4842-AE55-6F51EC11C0D1} = {DCF776B3-8563-419E-AFFC-307A1860D771}
@@ -67,5 +73,6 @@ Global
 		{85F4171A-C957-4CE0-9DAB-4F424A658FC1} = {DCF776B3-8563-419E-AFFC-307A1860D771}
 		{54B59EC9-FAE6-4304-A890-C995EA81431B} = {DCF776B3-8563-419E-AFFC-307A1860D771}
 		{24E9DDB3-C05D-4397-89AA-F92BA2C79B5A} = {0F815A91-8FA1-4A45-9F7F-2BA222B08FBD}
+		{6AC9FDA5-76BA-4351-BC0A-75484B144CC2} = {DCF776B3-8563-419E-AFFC-307A1860D771}
 	EndGlobalSection
 EndGlobal

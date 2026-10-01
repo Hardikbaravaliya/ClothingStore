@@ -1,0 +1,24 @@
+@model OrderDetailDto
+@{
+    ViewData["Title"] = "Thank you";
+}
+
+<div class="text-center py-4">
+    @if (Model.Status == "Cancelled")
+    {
+        <h1 class="h4 text-danger">Order @Model.OrderNo could not be completed</h1>
+        <p>@Model.CancelReason</p>
+    }
+    else
+    {
+        <h1 class="h4">Thank you! Your order is placed.</h1>
+        <p class="mb-1">Order number <strong>@Model.OrderNo</strong></p>
+        <p class="text-muted">
+            @(Model.PaymentMethod == PaymentMethods.Cod
+                ? $"Please keep {Shop.Money(Model.TotalAmount)} ready at delivery."
+                : $"Payment of {Shop.Money(Model.TotalAmount)} received.")
+        </p>
+    }
+    <a href="/orders/@Model.OrderNo" class="btn btn-brand">View order</a>
+    <a href="/" class="btn btn-outline-secondary">Continue shopping</a>
+</div>

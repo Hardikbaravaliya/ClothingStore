@@ -1,47 +1,77 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
+@{
+    var store = Shop.Store;
+    var storeName = store?.Name ?? "Store";
+    var brand = store?.ThemeColor ?? "#d63384";
+    var pageTitle = ViewData["Title"] is string t && t != storeName ? $"{t} | {storeName}" : storeName;
+}
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - ClothingStore.Catalog</title>
-    <script type="importmap"></script>
+    <title>@pageTitle</title>
+    @if (ViewData["MetaDescription"] is string description)
+    {
+        <meta name="description" content="@description" />
+    }
+    @if (ViewData["Canonical"] is string canonical)
+    {
+        <link rel="canonical" href="@canonical" />
+    }
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/ClothingStore.Catalog.styles.css" asp-append-version="true" />
+    <style>:root { --brand: @brand; }</style>
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">ClothingStore.Catalog</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
+<body class="d-flex flex-column min-vh-100">
+    <header class="border-bottom bg-white sticky-top">
+        <nav class="navbar navbar-expand-lg">
+            <div class="container-xl">
+                <a class="navbar-brand fw-bold brand-text" href="/">@storeName</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav"
+                        aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                    </ul>
+                <div class="collapse navbar-collapse" id="mainNav">
+                    @await Component.InvokeAsync("StoreNav")
                 </div>
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - ClothingStore.Catalog - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    <main role="main" class="container-xl py-4 flex-grow-1">
+        @if (TempData["Success"] is string success)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                @success
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                @error
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        }
+        @RenderBody()
+    </main>
+
+    <footer class="border-top bg-light py-4 mt-4">
+        <div class="container-xl d-flex flex-wrap justify-content-between gap-2 small text-muted">
+            <span>&copy; @DateTime.UtcNow.Year @storeName</span>
+            <span>
+                @if (!string.IsNullOrEmpty(store?.ContactPhone))
+                {
+                    <span class="me-3">Call: @store.ContactPhone</span>
+                }
+                @if (!string.IsNullOrEmpty(store?.ContactEmail))
+                {
+                    <a href="mailto:@store.ContactEmail">@store.ContactEmail</a>
+                }
+            </span>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

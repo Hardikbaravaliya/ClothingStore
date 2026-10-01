@@ -1,0 +1,46 @@
+@model IReadOnlyList<AddressDto>
+@{
+    ViewData["Title"] = "My addresses";
+}
+
+<h1 class="h4 mb-3">My addresses</h1>
+
+@if (Model.Count == 0)
+{
+    <p class="text-muted">No saved addresses yet. Addresses you use at checkout are saved here.</p>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var a in Model)
+        {
+            <div class="col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <div class="fw-semibold">
+                            @a.FullName
+                            @if (a.IsDefault)
+                            {
+                                <span class="badge brand-bg ms-1">Default</span>
+                            }
+                        </div>
+                        <div class="small">
+                            @a.Line1@(string.IsNullOrEmpty(a.Line2) ? "" : ", " + a.Line2)<br />
+                            @if (!string.IsNullOrEmpty(a.Landmark))
+                            {
+                                @a.Landmark<br />
+                            }
+                            @a.City, @a.State – @a.Pincode<br />
+                            Phone: @a.Phone
+                        </div>
+                        <form method="post" action="/account/addresses/delete" class="mt-2" data-confirm="Delete this address?">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@a.Id" />
+                            <button type="submit" class="btn btn-sm btn-link text-danger p-0">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

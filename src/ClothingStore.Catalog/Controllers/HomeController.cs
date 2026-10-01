@@ -1,25 +1,32 @@
 using System.Diagnostics;
 using ClothingStore.Catalog.ApiClients;
 using ClothingStore.Catalog.Models;
+using ClothingStore.Contracts.Catalog;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ClothingStore.Catalog.Controllers;
 
-public class HomeController(StoreApiClient storeApi) : Controller
+public class HomeController(StorefrontApi api) : Controller
 {
+    [Route("")]
     public async Task<IActionResult> Index(CancellationToken ct)
     {
-        var store = await storeApi.GetSettingsAsync(ct);
-        if (store is null)
-            return View("StoreNotFound");
+        var categories = api.GetCategoriesAsync(ct);
+        var featured = api.SearchProductsAsync(new ProductSearchRequest { FeaturedOnly = true, PageSize = 8 }, ct);
+        var latest = api.SearchProductsAsync(new ProductSearchRequest { PageSize = 8 }, ct);
+        await Task.WhenAll(categories, featured, latest);
 
-        return View(store);
+        return View(new HomeViewModel
+        {
+            Categories = categories.Result,
+            Featured = featured.Result.Items,
+            Latest = latest.Result.Items,
+        });
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+    public IActionResult StoreNotFound() => View();
+
+    public IActionResult PageNotFound() => View();
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

@@ -12,6 +12,14 @@ public sealed class TenancyOptions
 
     /// <summary>Domains whose first label is the tenant slug, e.g. "localhost" => shop1.localhost.</summary>
     public string[] RootDomains { get; set; } = ["localhost"];
+
+    /// <summary>Customer website of a store, used for links in emails. "{slug}" is replaced.</summary>
+    public string CatalogBaseUrlTemplate { get; set; } = "http://{slug}.localhost:5101";
+
+    public string GetCatalogBaseUrl(string slug, string? customDomain) =>
+        customDomain is { Length: > 0 }
+            ? $"https://{customDomain}"
+            : CatalogBaseUrlTemplate.Replace("{slug}", slug, StringComparison.OrdinalIgnoreCase).TrimEnd('/');
 }
 
 public interface ITenantResolver

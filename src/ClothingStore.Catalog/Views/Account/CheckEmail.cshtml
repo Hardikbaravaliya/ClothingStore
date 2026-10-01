@@ -1,0 +1,21 @@
+@{
+    ViewData["Title"] = "Check your email";
+    var email = TempData["Email"] as string;
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5 text-center">
+        <h1 class="h4 mb-3">Check your email</h1>
+        <p>
+            We sent a verification link@(email is null ? "" : " to ")<strong>@email</strong>.
+            Click it to activate your account, then log in.
+        </p>
+        <p class="text-muted small">Did not get it? Check spam, or send it again:</p>
+        <form method="post" action="/account/resend-confirmation" class="d-flex gap-2 justify-content-center">
+            @Html.AntiForgeryToken()
+            <input type="email" name="email" value="@email" class="form-control w-auto" placeholder="Your email" required />
+            <button type="submit" class="btn btn-outline-brand">Send again</button>
+        </form>
+        <a href="/account/login" class="d-inline-block mt-3">Go to login</a>
+    </div>
+</div>

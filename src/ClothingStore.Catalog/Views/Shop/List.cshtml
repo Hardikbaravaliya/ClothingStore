@@ -1,0 +1,139 @@
+@model ProductListViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    var r = Model.Request;
+    var f = Model.Filters;
+    var action = Model.Category is null ? "/search" : $"/c/{Model.Category.Slug}";
+    if (Model.Category?.Description is { Length: > 0 } description)
+    {
+        ViewData["MetaDescription"] = description;
+    }
+
+    string PageUrl(int page)
+    {
+        var query = Context.Request.Query
+            .Where(q => !q.Key.Equals("page", StringComparison.OrdinalIgnoreCase))
+            .SelectMany(q => q.Value.Select(v => $"{Uri.EscapeDataString(q.Key)}={Uri.EscapeDataString(v ?? "")}"))
+            .Append($"page={page}");
+        return $"{action}?{string.Join("&", query)}";
+    }
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    @* ---- Filters ---- *@
+    <aside class="col-lg-3">
+        <form method="get" action="@action" id="filters">
+            @if (Model.Category is null)
+            {
+                <input type="hidden" name="q" value="@r.Search" />
+            }
+
+            @if (Model.Category is { Children.Count: > 0 } parent)
+            {
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2">Category</div>
+                    @foreach (var child in parent.Children)
+                    {
+                        <a href="/c/@child.Slug" class="d-block small mb-1">@child.Name</a>
+                    }
+                </div>
+            }
+
+            @if (f.Sizes.Count > 0)
+            {
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2">Size</div>
+                    <div class="d-flex flex-wrap gap-1">
+                        @foreach (var size in f.Sizes)
+                        {
+                            var id = "size-" + size.GetHashCode();
+                            <input type="checkbox" class="btn-check" name="sizes" value="@size" id="@id" checked="@r.Sizes.Contains(size)" autocomplete="off" />
+                            <label class="btn btn-sm btn-outline-brand" for="@id">@size</label>
+                        }
+                    </div>
+                </div>
+            }
+
+            @if (f.Colors.Count > 0)
+            {
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2">Color</div>
+                    @foreach (var color in f.Colors)
+                    {
+                        var id = "color-" + color.GetHashCode();
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="colors" value="@color" id="@id" checked="@r.Colors.Contains(color)" />
+                            <label class="form-check-label" for="@id">@color</label>
+                        </div>
+                    }
+                </div>
+            }
+
+            @if (f.MaxPrice > 0)
+            {
+                <div class="mb-3">
+                    <div class="fw-semibold mb-2">Price</div>
+                    <div class="d-flex gap-2">
+                        <input type="number" name="minPrice" class="form-control form-control-sm" placeholder="@Math.Floor(f.MinPrice)" value="@r.MinPrice" min="0" aria-label="Minimum price" />
+                        <input type="number" name="maxPrice" class="form-control form-control-sm" placeholder="@Math.Ceiling(f.MaxPrice)" value="@r.MaxPrice" min="0" aria-label="Maximum price" />
+                    </div>
+                </div>
+            }
+
+            <input type="hidden" name="sort" value="@r.Sort" />
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-sm btn-brand">Apply</button>
+                <a href="@(Model.Category is null ? $"/search?q={Uri.EscapeDataString(r.Search ?? "")}" : action)" class="btn btn-sm btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </aside>
+
+    @* ---- Results ---- *@
+    <section class="col-lg-9">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+            <h1 class="h4 mb-0">@Model.Title <span class="text-muted fs-6">(@Model.Results.TotalCount)</span></h1>
+            <select class="form-select form-select-sm w-auto" aria-label="Sort" form="filters"
+                    onchange="document.querySelector('#filters [name=sort]').value=this.value; document.getElementById('filters').submit();">
+                <option value="" selected="@(string.IsNullOrEmpty(r.Sort))">Newest</option>
+                <option value="price_asc" selected="@(r.Sort == "price_asc")">Price: low to high</option>
+                <option value="price_desc" selected="@(r.Sort == "price_desc")">Price: high to low</option>
+                <option value="name" selected="@(r.Sort == "name")">Name</option>
+            </select>
+        </div>
+
+        @if (Model.Results.TotalCount == 0)
+        {
+            <div class="alert alert-light border">No products match. Try removing a filter.</div>
+        }
+        else
+        {
+            <div class="row row-cols-2 row-cols-md-3 g-3">
+                @foreach (var product in Model.Results.Items)
+                {
+                    <div class="col"><partial name="_ProductCard" model="product" /></div>
+                }
+            </div>
+
+            @if (Model.Results.TotalPages > 1)
+            {
+                <nav class="mt-4" aria-label="Pages">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item @(Model.Results.Page == 1 ? "disabled" : "")"><a class="page-link" href="@PageUrl(Model.Results.Page - 1)">Previous</a></li>
+                        @for (var p = Math.Max(1, Model.Results.Page - 2); p <= Math.Min(Model.Results.TotalPages, Model.Results.Page + 2); p++)
+                        {
+                            <li class="page-item @(p == Model.Results.Page ? "active" : "")"><a class="page-link" href="@PageUrl(p)">@p</a></li>
+                        }
+                        <li class="page-item @(Model.Results.Page == Model.Results.TotalPages ? "disabled" : "")"><a class="page-link" href="@PageUrl(Model.Results.Page + 1)">Next</a></li>
+                    </ul>
+                </nav>
+            }
+        }
+    </section>
+</div>

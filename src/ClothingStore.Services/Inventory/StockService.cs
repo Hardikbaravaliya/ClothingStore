@@ -57,6 +57,12 @@ public interface IStockService
     /// </summary>
     void RecordPurchase(ProductVariant variant, int quantity, decimal unitCost, int purchaseId, string? notes);
 
+    /// <summary>
+    /// Order confirmed: StockQty -= qty, "Out" ledger row. Returns false (and changes nothing) when
+    /// there is not enough stock. Caller saves inside its own DB transaction.
+    /// </summary>
+    bool TryRecordSale(ProductVariant variant, int quantity, int orderId, string orderNo);
+
     /// <summary>Manual correction after a physical count. Never goes below 0.</summary>
     Task<Result> AdjustAsync(StockAdjustForm form, CancellationToken ct = default);
 
@@ -95,6 +101,28 @@ public sealed class StockService(AppDbContext db) : IStockService
             ReferenceId = purchaseId,
             Notes = notes,
         });
+    }
+
+    public bool TryRecordSale(ProductVariant variant, int quantity, int orderId, string orderNo)
+    {
+        if (quantity <= 0)
+            throw new ArgumentOutOfRangeException(nameof(quantity), "Quantity sold must be positive.");
+        if (variant.StockQty < quantity)
+            return false;
+
+        variant.StockQty -= quantity;
+        db.StockTransactions.Add(new StockTransaction
+        {
+            ProductVariantId = variant.Id,
+            Type = StockTxnType.Out,
+            Quantity = -quantity,
+            BalanceAfter = variant.StockQty,
+            UnitCost = variant.AvgCostPrice,
+            ReferenceType = "Order",
+            ReferenceId = orderId,
+            Notes = $"Order {orderNo}",
+        });
+        return true;
     }
 
     public async Task<Result> AdjustAsync(StockAdjustForm form, CancellationToken ct = default)

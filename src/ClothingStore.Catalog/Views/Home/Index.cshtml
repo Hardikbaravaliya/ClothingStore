@@ -1,10 +1,60 @@
-@model ClothingStore.Catalog.ApiClients.StoreSettings
+@model HomeViewModel
 @{
-    ViewData["Title"] = Model.Name;
+    ViewData["Title"] = Shop.Store.Name;
+    ViewData["MetaDescription"] = $"{Shop.Store.Name} – kids clothing: girls wear and boys wear.";
 }
 
-<div class="text-center py-5">
-    <h1 class="display-5">@Model.Name</h1>
-    <p class="lead text-muted">Girls Wear &amp; Boys Wear</p>
-    <p class="small text-muted">Prices in @Model.CurrencyCode (@Model.CurrencySymbol)</p>
-</div>
+<section class="rounded-4 p-4 p-md-5 mb-4 text-white brand-bg">
+    <h1 class="display-6 fw-bold">@Shop.Store.Name</h1>
+    <p class="lead mb-3">Comfortable, colourful clothes for girls and boys.</p>
+    <a href="/search" class="btn btn-light">Shop all</a>
+</section>
+
+@if (Model.Categories.Count > 0)
+{
+    <h2 class="h5 mb-3">Shop by category</h2>
+    <div class="row g-3 mb-4">
+        @foreach (var category in Model.Categories)
+        {
+            <div class="col-12 col-md-6">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h3 class="h5"><a href="/c/@category.Slug" class="brand-text text-decoration-none">@category.Name</a></h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var child in category.Children)
+                            {
+                                <a href="/c/@child.Slug" class="btn btn-sm btn-outline-brand">@child.Name</a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@if (Model.Featured.Count > 0)
+{
+    <h2 class="h5 mb-3">Featured</h2>
+    <div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+        @foreach (var product in Model.Featured)
+        {
+            <div class="col"><partial name="_ProductCard" model="product" /></div>
+        }
+    </div>
+}
+
+<h2 class="h5 mb-3">New arrivals</h2>
+@if (Model.Latest.Count == 0)
+{
+    <p class="text-muted">Products are coming soon.</p>
+}
+else
+{
+    <div class="row row-cols-2 row-cols-md-4 g-3">
+        @foreach (var product in Model.Latest)
+        {
+            <div class="col"><partial name="_ProductCard" model="product" /></div>
+        }
+    </div>
+}

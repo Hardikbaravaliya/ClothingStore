@@ -1,0 +1,111 @@
+@model StoreSettingsForm
+@{
+    ViewData["Title"] = "Store settings";
+}
+
+<h1 class="h3 mb-3">Store settings</h1>
+
+<form asp-action="Index" method="post" autocomplete="off">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Store</div>
+        <div class="card-body row g-3">
+            <div class="col-md-6">
+                <label asp-for="StoreName" class="form-label"></label>
+                <input asp-for="StoreName" class="form-control" />
+                <span asp-validation-for="StoreName" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="ThemeColor" class="form-label"></label>
+                <input asp-for="ThemeColor" class="form-control" placeholder="#d63384" />
+                <span asp-validation-for="ThemeColor" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="GstNo" class="form-label"></label>
+                <input asp-for="GstNo" class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ContactEmail" class="form-label"></label>
+                <input asp-for="ContactEmail" class="form-control" />
+                <span asp-validation-for="ContactEmail" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="ContactPhone" class="form-label"></label>
+                <input asp-for="ContactPhone" class="form-control" />
+                <span asp-validation-for="ContactPhone" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Address" class="form-label"></label>
+                <input asp-for="Address" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Time zone &amp; currency</div>
+        <div class="card-body row g-3">
+            <div class="col-md-3">
+                <label asp-for="TimeZoneId" class="form-label"></label>
+                <input asp-for="TimeZoneId" class="form-control" />
+                <span asp-validation-for="TimeZoneId" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="CurrencyCode" class="form-label"></label>
+                <input asp-for="CurrencyCode" class="form-control" />
+                <span asp-validation-for="CurrencyCode" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="CurrencySymbol" class="form-label"></label>
+                <input asp-for="CurrencySymbol" class="form-control" />
+                <span asp-validation-for="CurrencySymbol" class="text-danger"></span>
+            </div>
+            <div class="col-md-3">
+                <label asp-for="CultureName" class="form-label"></label>
+                <input asp-for="CultureName" class="form-control" />
+                <span asp-validation-for="CultureName" class="text-danger"></span>
+            </div>
+            <div class="col-12">
+                <div class="alert alert-warning mb-0 small">
+                    Changing the currency does <strong>not</strong> convert prices. Update product prices yourself after changing it.
+                    Old orders keep the currency they were placed in.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header fw-semibold">Online payment (Razorpay)</div>
+        <div class="card-body row g-3">
+            <div class="col-12 small text-muted">
+                Use <strong>test keys</strong> (rzp_test_…) while testing. Leave Key Id empty to turn online payment off (Cash on Delivery stays on).
+                Secrets are stored encrypted and never shown again; leave a secret empty to keep the saved one.
+            </div>
+            <div class="col-md-4">
+                <label asp-for="RazorpayKeyId" class="form-label"></label>
+                <input asp-for="RazorpayKeyId" class="form-control" placeholder="rzp_test_..." />
+                <span asp-validation-for="RazorpayKeyId" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="RazorpayKeySecret" class="form-label"></label>
+                <input asp-for="RazorpayKeySecret" class="form-control" autocomplete="new-password"
+                       placeholder="@(Model.HasRazorpayKeySecret ? "Saved – leave empty to keep" : "")" />
+            </div>
+            <div class="col-md-4">
+                <label asp-for="RazorpayWebhookSecret" class="form-label"></label>
+                <input asp-for="RazorpayWebhookSecret" class="form-control" autocomplete="new-password"
+                       placeholder="@(Model.HasRazorpayWebhookSecret ? "Saved – leave empty to keep" : "Optional")" />
+            </div>
+            <div class="col-12 small text-muted">
+                Webhook URL for the Razorpay dashboard (events: payment.captured, payment.failed):
+                <code>https://&lt;api-domain&gt;/api/webhooks/razorpay/&lt;store code&gt;</code>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save settings</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

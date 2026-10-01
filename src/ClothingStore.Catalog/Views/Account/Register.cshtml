@@ -1,0 +1,40 @@
+@model RegisterRequest
+@{
+    ViewData["Title"] = "Create account";
+}
+
+<div class="row justify-content-center">
+    <div class="col-sm-9 col-md-6 col-lg-4">
+        <h1 class="h4 mb-3">Create account</h1>
+        <form method="post" action="/account/register" asp-antiforgery="true">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label"></label>
+                <input asp-for="FullName" class="form-control" autocomplete="name" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" autocomplete="email" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label">Mobile (optional)</label>
+                <input asp-for="Phone" class="form-control" autocomplete="tel" />
+                <span asp-validation-for="Phone" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" autocomplete="new-password" />
+                <div class="form-text">At least 8 characters, with upper and lower case letters and a number.</div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <button type="submit" class="btn btn-brand w-100">Create account</button>
+        </form>
+        <div class="mt-3 small">Already have an account? <a href="/account/login">Login</a></div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

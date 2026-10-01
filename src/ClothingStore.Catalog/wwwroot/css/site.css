@@ -1,5 +1,5 @@
 html {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 @media (min-width: 768px) {
@@ -8,24 +8,57 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+/* Store theme color comes from the layout: :root { --brand: #xxxxxx } */
+.brand-text { color: var(--brand) !important; }
+.brand-bg { background-color: var(--brand) !important; color: #fff; }
+
+.btn-brand {
+  background-color: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-brand:hover, .btn-brand:focus {
+  filter: brightness(0.9);
+  color: #fff;
+}
+.btn-outline-brand {
+  border-color: var(--brand);
+  color: var(--brand);
+}
+.btn-outline-brand:hover, .btn-check:checked + .btn-outline-brand {
+  background-color: var(--brand);
+  color: #fff;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+.product-card img, .product-thumb {
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  width: 100%;
+  background: #f5f5f5;
+}
+.product-card .card-title {
+  font-size: 0.95rem;
+}
+.product-card a { color: inherit; text-decoration: none; }
+.mrp { text-decoration: line-through; color: #888; font-size: 0.85em; }
+.img-placeholder {
+  aspect-ratio: 3 / 4;
+  background: #f1f1f1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #aaa;
 }
 
-body {
-  margin-bottom: 60px;
-}
-
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
-  color: var(--bs-secondary-color);
-  text-align: end;
-}
-
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
-  text-align: start;
+.timeline { list-style: none; padding-left: 0; }
+.timeline li { position: relative; padding-left: 1.5rem; padding-bottom: 0.75rem; }
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: 0.25rem;
+  top: 0.35rem;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--brand);
 }

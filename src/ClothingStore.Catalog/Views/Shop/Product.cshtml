@@ -1,0 +1,152 @@
+@model ProductDetailDto
+@{
+    ViewData["Title"] = Model.MetaTitle ?? Model.Name;
+    ViewData["MetaDescription"] = Model.MetaDescription ?? (Model.Description?.Length > 160 ? Model.Description[..160] : Model.Description);
+    var sizes = Model.Variants.Select(v => v.Size).Distinct().ToList();
+    var colors = Model.Variants.Select(v => v.Color).Distinct().ToList();
+    var first = Model.Variants.FirstOrDefault(v => v.InStock) ?? Model.Variants.First();
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb small">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/c/@Model.CategorySlug">@Model.CategoryName</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+    </ol>
+</nav>
+
+<div class="row g-4">
+    @* ---- Images ---- *@
+    <div class="col-md-6">
+        @if (Model.ImageUrls.Count == 0)
+        {
+            <div class="img-placeholder rounded">No image</div>
+        }
+        else
+        {
+            <img id="main-image" src="@Model.ImageUrls[0]" alt="@Model.Name" class="product-thumb rounded mb-2" />
+            @if (Model.ImageUrls.Count > 1)
+            {
+                <div class="d-flex flex-wrap gap-2">
+                    @foreach (var url in Model.ImageUrls)
+                    {
+                        <button type="button" class="btn p-0 border js-thumb" data-src="@url" aria-label="Show image">
+                            <img src="@url" alt="" style="width:64px;height:84px;object-fit:cover" loading="lazy" />
+                        </button>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    @* ---- Details & buy ---- *@
+    <div class="col-md-6">
+        <h1 class="h3">@Model.Name</h1>
+        @if (!string.IsNullOrEmpty(Model.Brand))
+        {
+            <div class="text-muted mb-2">@Model.Brand</div>
+        }
+
+        <div class="fs-4 mb-3">
+            <span id="price" class="fw-semibold">@Shop.Money(first.Price)</span>
+            <span id="mrp" class="mrp ms-2 @(first.Mrp > first.Price ? "" : "d-none")">@Shop.Money(first.Mrp)</span>
+        </div>
+
+        <form action="/cart/add" method="post" id="buy-form">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="variantId" id="variantId" value="@first.Id" />
+            <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+
+            <div class="mb-3">
+                <div class="fw-semibold mb-2">Size</div>
+                <div class="d-flex flex-wrap gap-2">
+                    @for (var i = 0; i < sizes.Count; i++)
+                    {
+                        <input type="radio" class="btn-check js-size" name="size" id="size-@i" value="@sizes[i]" checked="@(sizes[i] == first.Size)" autocomplete="off" />
+                        <label class="btn btn-outline-brand" for="size-@i">@sizes[i]</label>
+                    }
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <div class="fw-semibold mb-2">Color</div>
+                <div class="d-flex flex-wrap gap-2">
+                    @for (var i = 0; i < colors.Count; i++)
+                    {
+                        <input type="radio" class="btn-check js-color" name="color" id="color-@i" value="@colors[i]" checked="@(colors[i] == first.Color)" autocomplete="off" />
+                        <label class="btn btn-outline-brand" for="color-@i">@colors[i]</label>
+                    }
+                </div>
+            </div>
+
+            <div id="stock-note" class="small mb-3"></div>
+
+            <div class="d-flex gap-2 align-items-center">
+                <input type="number" name="quantity" value="1" min="1" max="10" class="form-control" style="width:90px" aria-label="Quantity" />
+                <button type="submit" id="add-button" class="btn btn-brand btn-lg">Add to cart</button>
+            </div>
+        </form>
+
+        <dl class="row mt-4 small">
+            @if (!string.IsNullOrEmpty(Model.Fabric))
+            {
+                <dt class="col-4">Fabric</dt><dd class="col-8">@Model.Fabric</dd>
+            }
+            @if (!string.IsNullOrEmpty(Model.AgeGroup))
+            {
+                <dt class="col-4">Age group</dt><dd class="col-8">@Model.AgeGroup</dd>
+            }
+        </dl>
+
+        @if (!string.IsNullOrEmpty(Model.Description))
+        {
+            <h2 class="h6 mt-3">Description</h2>
+            <p class="text-muted" style="white-space:pre-line">@Model.Description</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            var variants = @Json.Serialize(Model.Variants.Select(v => new { v.Id, v.Size, v.Color, price = Shop.Money(v.Price), mrp = Shop.Money(v.Mrp), showMrp = v.Mrp > v.Price, qty = v.AvailableQuantity }));
+            var form = document.getElementById('buy-form');
+
+            function selected(cls) {
+                var el = form.querySelector('.' + cls + ':checked');
+                return el ? el.value : null;
+            }
+
+            function update() {
+                var size = selected('js-size'), color = selected('js-color');
+                var v = variants.find(function (x) { return x.size === size && x.color === color; });
+                var note = document.getElementById('stock-note');
+                var button = document.getElementById('add-button');
+
+                if (!v) {
+                    note.textContent = 'This size and color combination is not available.';
+                    note.className = 'small mb-3 text-danger';
+                    button.disabled = true;
+                    return;
+                }
+
+                document.getElementById('variantId').value = v.id;
+                document.getElementById('price').textContent = v.price;
+                var mrp = document.getElementById('mrp');
+                mrp.textContent = v.mrp;
+                mrp.classList.toggle('d-none', !v.showMrp);
+
+                button.disabled = v.qty === 0;
+                if (v.qty === 0) { note.textContent = 'Out of stock'; note.className = 'small mb-3 text-danger'; }
+                else if (v.qty <= 3) { note.textContent = 'Only ' + v.qty + ' left'; note.className = 'small mb-3 text-warning'; }
+                else { note.textContent = 'In stock'; note.className = 'small mb-3 text-success'; }
+            }
+
+            form.addEventListener('change', update);
+            document.querySelectorAll('.js-thumb').forEach(function (b) {
+                b.addEventListener('click', function () { document.getElementById('main-image').src = b.dataset.src; });
+            });
+            update();
+        })();
+    </script>
+}

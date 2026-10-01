@@ -1,0 +1,30 @@
+@model ProductSummaryDto
+
+<div class="card h-100 border-0 shadow-sm product-card">
+    <a href="/p/@Model.Slug">
+        @if (Model.ImageUrl is not null)
+        {
+            <img src="@Model.ImageUrl" alt="@Model.Name" class="card-img-top" loading="lazy" />
+        }
+        else
+        {
+            <div class="img-placeholder card-img-top">No image</div>
+        }
+    </a>
+    <div class="card-body p-2">
+        <div class="small text-muted">@Model.CategoryName</div>
+        <h3 class="card-title mb-1"><a href="/p/@Model.Slug">@Model.Name</a></h3>
+        <div>
+            <span class="fw-semibold">@Shop.Money(Model.Price)</span>
+            @if (Model.Mrp > Model.Price)
+            {
+                <span class="mrp ms-1">@Shop.Money(Model.Mrp)</span>
+                <span class="small text-success ms-1">@Math.Round((Model.Mrp - Model.Price) * 100 / Model.Mrp)% off</span>
+            }
+        </div>
+        @if (!Model.InStock)
+        {
+            <span class="badge text-bg-secondary mt-1">Out of stock</span>
+        }
+    </div>
+</div>

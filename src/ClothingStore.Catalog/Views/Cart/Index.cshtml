@@ -1,0 +1,88 @@
+@model CartDto
+@{
+    ViewData["Title"] = "Cart";
+}
+
+<h1 class="h4 mb-3">Your cart</h1>
+
+@if (Model.Items.Count == 0)
+{
+    <div class="text-center py-5">
+        <p class="text-muted">Your cart is empty.</p>
+        <a href="/" class="btn btn-brand">Continue shopping</a>
+    </div>
+}
+else
+{
+    <div class="row g-4">
+        <div class="col-lg-8">
+            @foreach (var item in Model.Items)
+            {
+                <div class="card mb-3 @(item.IsAvailable ? "" : "border-danger")">
+                    <div class="card-body d-flex gap-3">
+                        <a href="/p/@item.ProductSlug" style="width:80px" class="flex-shrink-0">
+                            @if (item.ImageUrl is not null)
+                            {
+                                <img src="@item.ImageUrl" alt="" class="product-thumb rounded" />
+                            }
+                            else
+                            {
+                                <div class="img-placeholder rounded small">No image</div>
+                            }
+                        </a>
+                        <div class="flex-grow-1">
+                            <a href="/p/@item.ProductSlug" class="fw-semibold text-decoration-none text-body">@item.ProductName</a>
+                            <div class="small text-muted">Size @item.Size · @item.Color</div>
+                            <div class="small">@Shop.Money(item.UnitPrice) each</div>
+                            @if (!item.IsAvailable)
+                            {
+                                <div class="small text-danger mt-1">
+                                    @(item.AvailableQuantity == 0 ? "Out of stock – please remove it." : $"Only {item.AvailableQuantity} left – reduce the quantity.")
+                                </div>
+                            }
+                            <div class="d-flex flex-wrap gap-2 align-items-center mt-2">
+                                <form action="/cart/update" method="post" class="d-flex gap-1">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="variantId" value="@item.VariantId" />
+                                    <input type="number" name="quantity" value="@item.Quantity" min="1" max="10" class="form-control form-control-sm" style="width:70px" aria-label="Quantity" />
+                                    <button type="submit" class="btn btn-sm btn-outline-secondary">Update</button>
+                                </form>
+                                <form action="/cart/remove" method="post">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="variantId" value="@item.VariantId" />
+                                    <button type="submit" class="btn btn-sm btn-link text-danger">Remove</button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="fw-semibold text-nowrap">@Shop.Money(item.LineTotal)</div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Items (@Model.ItemCount)</span>
+                        <span>@Shop.Money(Model.SubTotal)</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small text-muted">
+                        <span>Delivery</span><span>Free</span>
+                    </div>
+                    <div class="d-flex justify-content-between fw-semibold fs-5 mb-3">
+                        <span>Total</span><span>@Shop.Money(Model.SubTotal)</span>
+                    </div>
+                    @if (Model.CanCheckout)
+                    {
+                        <a href="/checkout" class="btn btn-brand w-100">Checkout</a>
+                    }
+                    else
+                    {
+                        <button class="btn btn-secondary w-100" disabled>Fix the items marked in red</button>
+                    }
+                    <p class="small text-muted mt-2 mb-0">Prices include GST.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}

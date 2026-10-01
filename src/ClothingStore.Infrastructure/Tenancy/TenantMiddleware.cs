@@ -7,8 +7,8 @@ using Microsoft.Extensions.Logging;
 namespace ClothingStore.Infrastructure.Tenancy;
 
 /// <summary>
-/// Api: resolves the tenant from the "X-Tenant" header (slug or host), else from the request Host.
-/// Only /api paths need a tenant; unknown tenant => 404, suspended => 403.
+/// Api: resolves the tenant from the "X-Tenant" header (slug or host), else from the request Host
+/// (webhooks: from the last URL segment). Only /api paths need a tenant; unknown => 404, suspended => 403.
 /// </summary>
 public sealed class ApiTenantMiddleware(RequestDelegate next, ILogger<ApiTenantMiddleware> logger)
 {
@@ -22,7 +22,11 @@ public sealed class ApiTenantMiddleware(RequestDelegate next, ILogger<ApiTenantM
             return;
         }
 
-        var key = context.Request.Headers[HeaderName].FirstOrDefault() ?? context.Request.Host.Host;
+        // Webhooks (Razorpay, Shiprocket) cannot send our header: the store is in the URL,
+        // e.g. /api/webhooks/razorpay/shop1
+        var key = context.Request.Path.StartsWithSegments("/api/webhooks", out var rest)
+            ? rest.Value?.Split('/', StringSplitOptions.RemoveEmptyEntries).LastOrDefault()
+            : context.Request.Headers[HeaderName].FirstOrDefault() ?? context.Request.Host.Host;
         var tenant = await resolver.ResolveAsync(key, context.RequestAborted);
 
         if (tenant is null)

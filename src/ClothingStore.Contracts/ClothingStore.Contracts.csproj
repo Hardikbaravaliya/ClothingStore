@@ -1,0 +1,5 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Api request/response models shared by Api, Catalog (and a future mobile app). No other dependencies. -->
+
+</Project>

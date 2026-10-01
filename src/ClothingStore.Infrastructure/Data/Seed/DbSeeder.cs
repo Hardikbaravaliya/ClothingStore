@@ -109,6 +109,14 @@ public static class DbSeeder
 
         await EnsureUserAsync(userManager, logger, tenant.Id, $"admin@{slug}.local", adminPassword, $"{name} Admin", AppRoles.TenantAdmin);
 
+        // Demo customer (email already verified) for trying the website
+        var customerUser = await EnsureUserAsync(userManager, logger, tenant.Id, $"customer@{slug}.local", adminPassword, "Demo Customer", AppRoles.Customer);
+        if (customerUser is not null && !await db.Customers.AnyAsync(c => c.UserId == customerUser.Id, ct))
+        {
+            db.Customers.Add(new Customer { UserId = customerUser.Id, FullName = customerUser.FullName, Email = customerUser.Email! });
+            await db.SaveChangesAsync(ct);
+        }
+
         if (!await db.Categories.AnyAsync(ct))
         {
             var girls = new Category { Name = "Girls Wear", Slug = "girls-wear", SortOrder = 1 };
@@ -125,13 +133,13 @@ public static class DbSeeder
         }
     }
 
-    private static async Task EnsureUserAsync(
+    private static async Task<ApplicationUser?> EnsureUserAsync(
         UserManager<ApplicationUser> userManager, ILogger logger,
         int? tenantId, string email, string password, string fullName, string role)
     {
         // FindByEmail is tenant-filtered: the caller must have set the tenant first
-        if (await userManager.FindByEmailAsync(email) is not null)
-            return;
+        if (await userManager.FindByEmailAsync(email) is { } existing)
+            return existing;
 
         var user = new ApplicationUser
         {
@@ -152,5 +160,6 @@ public static class DbSeeder
                 $"Seeding user {email} failed: {string.Join("; ", result.Errors.Select(e => e.Description))}");
 
         logger.LogInformation("Seeded user {Email} ({Role})", email, role);
+        return user;
     }
 }

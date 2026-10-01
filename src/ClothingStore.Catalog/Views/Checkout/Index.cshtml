@@ -1,0 +1,141 @@
+@model CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    var f = Model.Form;
+}
+
+<h1 class="h4 mb-3">Checkout</h1>
+
+<form method="post" action="/checkout" asp-antiforgery="true">
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            @* ---- Address ---- *@
+            <div class="card mb-4">
+                <div class="card-header fw-semibold">Delivery address</div>
+                <div class="card-body">
+                    @foreach (var a in Model.Addresses)
+                    {
+                        <div class="form-check mb-2">
+                            <input class="form-check-input js-address" type="radio" name="Form.AddressId" id="addr-@a.Id" value="@a.Id"
+                                   checked="@(!f.UseNewAddress && f.AddressId == a.Id)" />
+                            <label class="form-check-label" for="addr-@a.Id">
+                                <strong>@a.FullName</strong>, @a.Line1@(string.IsNullOrEmpty(a.Line2) ? "" : ", " + a.Line2), @a.City, @a.State – @a.Pincode · @a.Phone
+                            </label>
+                        </div>
+                    }
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" name="Form.UseNewAddress" id="use-new" value="true" checked="@f.UseNewAddress" />
+                        <label class="form-check-label" for="use-new">Deliver to a new address</label>
+                    </div>
+                    <span asp-validation-for="Form.AddressId" class="text-danger small"></span>
+
+                    <div id="new-address" class="row g-2 mt-1 @(f.UseNewAddress ? "" : "d-none")">
+                        <div class="col-md-6">
+                            <label asp-for="Form.NewAddress.FullName" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.FullName" class="form-control" autocomplete="name" />
+                            <span asp-validation-for="Form.NewAddress.FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Form.NewAddress.Phone" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.Phone" class="form-control" autocomplete="tel" />
+                            <span asp-validation-for="Form.NewAddress.Phone" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Form.NewAddress.Line1" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.Line1" class="form-control" autocomplete="address-line1" />
+                            <span asp-validation-for="Form.NewAddress.Line1" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Form.NewAddress.Line2" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.Line2" class="form-control" autocomplete="address-line2" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Form.NewAddress.Landmark" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.Landmark" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Form.NewAddress.City" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.City" class="form-control" autocomplete="address-level2" />
+                            <span asp-validation-for="Form.NewAddress.City" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Form.NewAddress.State" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.State" class="form-control" autocomplete="address-level1" />
+                            <span asp-validation-for="Form.NewAddress.State" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Form.NewAddress.Pincode" class="form-label small"></label>
+                            <input asp-for="Form.NewAddress.Pincode" class="form-control" autocomplete="postal-code" inputmode="numeric" />
+                            <span asp-validation-for="Form.NewAddress.Pincode" class="text-danger small"></span>
+                        </div>
+                        <input type="hidden" asp-for="Form.NewAddress.Country" />
+                    </div>
+                </div>
+            </div>
+
+            @* ---- Payment ---- *@
+            <div class="card mb-4">
+                <div class="card-header fw-semibold">Payment</div>
+                <div class="card-body">
+                    @if (Model.OnlinePaymentEnabled)
+                    {
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="radio" name="Form.PaymentMethod" id="pay-online" value="@PaymentMethods.Online" checked="@(f.PaymentMethod == PaymentMethods.Online)" />
+                            <label class="form-check-label" for="pay-online">Pay online (UPI, card, net banking, wallet)</label>
+                        </div>
+                    }
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="Form.PaymentMethod" id="pay-cod" value="@PaymentMethods.Cod" checked="@(f.PaymentMethod == PaymentMethods.Cod || !Model.OnlinePaymentEnabled)" />
+                        <label class="form-check-label" for="pay-cod">Cash on delivery</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Form.Notes" class="form-label"></label>
+                <textarea asp-for="Form.Notes" class="form-control" rows="2"></textarea>
+            </div>
+        </div>
+
+        @* ---- Summary ---- *@
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header fw-semibold">Order summary</div>
+                <ul class="list-group list-group-flush">
+                    @foreach (var item in Model.Cart.Items)
+                    {
+                        <li class="list-group-item d-flex justify-content-between small">
+                            <span>@item.ProductName <span class="text-muted">(@item.Size / @item.Color) × @item.Quantity</span></span>
+                            <span class="text-nowrap ms-2">@Shop.Money(item.LineTotal)</span>
+                        </li>
+                    }
+                </ul>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between small text-muted"><span>Delivery</span><span>Free</span></div>
+                    <div class="d-flex justify-content-between fw-semibold fs-5 mt-2"><span>Total</span><span>@Shop.Money(Model.Cart.SubTotal)</span></div>
+                    <button type="submit" class="btn btn-brand w-100 mt-3" @(Model.Cart.CanCheckout ? "" : "disabled")>Place order</button>
+                    @if (!Model.Cart.CanCheckout)
+                    {
+                        <p class="small text-danger mt-2 mb-0">Some items are out of stock. <a href="/cart">Fix your cart</a>.</p>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            var useNew = document.getElementById('use-new');
+            var panel = document.getElementById('new-address');
+            function sync() { panel.classList.toggle('d-none', !useNew.checked); }
+            useNew.addEventListener('change', sync);
+            document.querySelectorAll('.js-address').forEach(function (r) {
+                r.addEventListener('change', function () { useNew.checked = false; sync(); });
+            });
+        })();
+    </script>
+}

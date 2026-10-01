@@ -228,23 +228,23 @@ ClothingStore.sln
 - [ ] Coupons (optional)
 
 ### 6.2 Catalog (Customer website)
-- [ ] Home page, category listing, filters (size, color, price), search
+- [x] Home page, category listing, filters (size, color, price), search
 - [ ] Product detail (images, size chart, variant select)
-- [ ] Customer register/login: Email + Password, email verification, forgot/reset password
-- [ ] Cart ane checkout (address)
-- [ ] Payment: Razorpay / COD
-- [ ] My Orders ane tracking timeline
+- [x] Customer register/login: Email + Password, email verification, forgot/reset password
+- [x] Cart ane checkout (address)
+- [x] Payment: Razorpay / COD
+- [x] My Orders ane tracking timeline
 - [ ] Return / Exchange request
-- [ ] SEO-friendly URLs ane meta tags
+- [x] SEO-friendly URLs ane meta tags
 
 ### 6.3 API
-- [ ] JWT auth (customer)
-- [ ] Catalog endpoints (categories, products, product detail)
-- [ ] Cart, Checkout, Orders endpoints
-- [ ] Razorpay: create order, payment verify, webhook endpoints
+- [x] JWT auth (customer)
+- [x] Catalog endpoints (categories, products, product detail)
+- [x] Cart, Checkout, Orders endpoints
+- [x] Razorpay: create order, payment verify, webhook endpoints
 - [ ] Tracking endpoint
 - [ ] Shiprocket webhook endpoint
-- [ ] Swagger (dev ma)
+- [x] Swagger (dev ma)
 
 ---
 
@@ -362,8 +362,8 @@ Amount, Status (Pending/Paid/Failed/Refunded), RefundId, RefundAmount, CreatedAt
 ### Checklist
 - [ ] Razorpay account ane KYC
 - [ ] Test keys thi development, live keys fakt production ma
-- [ ] Create order + Checkout + Verify signature
-- [ ] Webhook endpoint ane signature verify
+- [x] Create order + Checkout + Verify signature
+- [x] Webhook endpoint ane signature verify
 - [ ] Refund (Manager)
 - [ ] Payment report (Online vs COD, Failed payments)
 
@@ -446,7 +446,7 @@ Live jati vakhte **fakt config badlay, code nahi.**
 |---|---|---|
 | 1 | Solution setup, Core, Infrastructure, **Multi-tenancy (Tenants, TenantId, query filter, middleware)**, DB tables, Identity, Migrations | ✅ Done |
 | 2 | Manager: Category, Product, Variants, Images, Supplier, Purchase, Stock | ✅ Done |
-| 3 | Api + Catalog: Product list/detail, filter, cart, checkout, payment, order | ⏳ Pending |
+| 3 | Api + Catalog: Product list/detail, filter, cart, checkout, payment, order | ✅ Done |
 | 4 | Manager: Order management + Shiprocket; Catalog: tracking page | ⏳ Pending |
 | 5 | Reports dashboard + Excel/PDF export | ⏳ Pending |
 | 6 | Returns, Coupons, GST invoice, (future) Mobile app | ⏳ Pending |
@@ -465,6 +465,19 @@ Live jati vakhte **fakt config badlay, code nahi.**
 ## 16. Changelog
 
 > Navo change aave to **upar** navi line add karo: `YYYY-MM-DD – shu badlayu`
+
+- **2026-10-01** – **Phase 3 puro.** Api + Catalog: categories, product list/filters/search, product detail, customer register/login
+  (email verification, forgot/reset password), cart (guest + login merge), checkout (address), COD + Razorpay, My orders + timeline.
+  Manager ma **Store settings** (contact, timezone/currency, Razorpay keys). Nakki karela nirnayo:
+  - Navo project **ClothingStore.Contracts**: Api na request/response models; Catalog EF/Services ne reference nathi kartu.
+  - Customer login **JWT (7 divas)**, Catalog ni encrypted login cookie ma rakhay. Refresh token haju nathi.
+  - Login pehla **email verify farajiyat**. Email/reset links hamesha store na potana domain par (`Tenancy:CatalogBaseUrlTemplate`).
+  - Razorpay keys DB ma **Data Protection thi encrypted**; key ring `D:\ClothingStore\keys` Manager ane Api share kare.
+  - Online order **Pending** rahe, stock payment verify thay pachhi j ghate; cart pan tyare j khali thay. Payment confirm idempotent
+    (verify + webhook banne aave to pan ek j var). Payment pachhi stock na hoy to order Cancelled + "refund pending" (refund Phase 4).
+  - Delivery charge, tax ane coupon haal **0** (prices GST sathe). Shipping rules Phase 4 ma.
+  - Customer ne stock "max 10" sudhi j dekhay; sacho stock khanagi.
+  - Login/register/password endpoints par rate limit (10/min/IP).
 
 - **2026-10-01** – **Phase 2 puro.** Manager ma Categories (2 level), Products, Variants, Images, Suppliers, Purchases ane Stock (list, low-stock, ledger, adjust).
   Nakki karela nirnayo:

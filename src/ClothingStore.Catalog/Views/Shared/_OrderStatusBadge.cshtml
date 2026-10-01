@@ -1,0 +1,17 @@
+@model string
+@{
+    var (css, text) = Model switch
+    {
+        "Pending" => ("text-bg-warning", "Awaiting payment"),
+        "Confirmed" => ("text-bg-primary", "Confirmed"),
+        "Packed" => ("text-bg-info", "Packed"),
+        "Shipped" => ("text-bg-info", "Shipped"),
+        "OutForDelivery" => ("text-bg-info", "Out for delivery"),
+        "Delivered" => ("text-bg-success", "Delivered"),
+        "Cancelled" => ("text-bg-secondary", "Cancelled"),
+        "ReturnRequested" => ("text-bg-warning", "Return requested"),
+        "Returned" => ("text-bg-secondary", "Returned"),
+        _ => ("text-bg-light", Model),
+    };
+}
+<span class="badge @css">@text</span>

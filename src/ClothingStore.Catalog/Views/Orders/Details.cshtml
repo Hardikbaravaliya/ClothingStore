@@ -1,0 +1,98 @@
+@model OrderDetailDto
+@{
+    ViewData["Title"] = $"Order {Model.OrderNo}";
+    var a = Model.ShippingAddress;
+}
+
+<a href="/orders" class="small">← My orders</a>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <h1 class="h4 mb-0">Order @Model.OrderNo</h1>
+    <partial name="_OrderStatusBadge" model="Model.Status" />
+</div>
+
+@if (Model.CanRetryPayment)
+{
+    <div class="alert alert-warning d-flex flex-wrap justify-content-between align-items-center gap-2">
+        <span>This order is waiting for payment.</span>
+        <a href="/checkout/pay/@Model.OrderNo" class="btn btn-sm btn-brand">Pay now</a>
+    </div>
+}
+@if (!string.IsNullOrEmpty(Model.CancelReason))
+{
+    <div class="alert alert-secondary">@Model.CancelReason</div>
+}
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card mb-3">
+            <ul class="list-group list-group-flush">
+                @foreach (var item in Model.Items)
+                {
+                    <li class="list-group-item d-flex gap-3 align-items-center">
+                        <div style="width:56px" class="flex-shrink-0">
+                            @if (item.ImageUrl is not null)
+                            {
+                                <img src="@item.ImageUrl" alt="" class="product-thumb rounded" />
+                            }
+                        </div>
+                        <div class="flex-grow-1">
+                            @if (item.ProductSlug is not null)
+                            {
+                                <a href="/p/@item.ProductSlug" class="text-body">@item.ProductName</a>
+                            }
+                            else
+                            {
+                                @item.ProductName
+                            }
+                            <div class="small text-muted">Size @item.Size · @item.Color · @item.Quantity × @Shop.Money(item.UnitPrice)</div>
+                        </div>
+                        <div class="fw-semibold text-nowrap">@Shop.Money(item.LineTotal)</div>
+                    </li>
+                }
+            </ul>
+            <div class="card-body">
+                <div class="d-flex justify-content-between small"><span>Items</span><span>@Shop.Money(Model.SubTotal)</span></div>
+                @if (Model.DiscountAmount > 0)
+                {
+                    <div class="d-flex justify-content-between small text-success"><span>Discount</span><span>−@Shop.Money(Model.DiscountAmount)</span></div>
+                }
+                <div class="d-flex justify-content-between small"><span>Delivery</span><span>@(Model.ShippingCharge > 0 ? Shop.Money(Model.ShippingCharge) : "Free")</span></div>
+                <div class="d-flex justify-content-between fw-semibold fs-5 mt-2"><span>Total</span><span>@Shop.Money(Model.TotalAmount)</span></div>
+                <div class="small text-muted mt-1">
+                    @(Model.PaymentMethod == PaymentMethods.Cod ? "Cash on delivery" : "Paid online") · Payment: @Model.PaymentStatus
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card mb-3">
+            <div class="card-header fw-semibold">Delivery address</div>
+            <div class="card-body small">
+                <strong>@a.Name</strong><br />
+                @a.Line1<br />
+                @if (!string.IsNullOrEmpty(a.Line2))
+                {
+                    @a.Line2<br />
+                }
+                @a.City, @a.State – @a.Pincode<br />
+                Phone: @a.Phone
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header fw-semibold">Tracking</div>
+            <div class="card-body">
+                <ul class="timeline mb-0">
+                    @foreach (var e in Model.Timeline)
+                    {
+                        <li>
+                            <div class="fw-semibold small">@e.Title</div>
+                            <div class="small text-muted">@Shop.ToLocal(e.AtUtc).ToString("dd MMM yyyy, hh:mm tt")</div>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

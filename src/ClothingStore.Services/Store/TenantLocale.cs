@@ -21,6 +21,8 @@ public sealed class TenantLocaleAccessor(AppDbContext db, ITenantProvider tenant
 {
     private TenantLocale? _current;
 
+    public static string CacheKey(int tenantId) => $"tenant:{tenantId}:locale";
+
     public TenantLocale Current => _current ??= Load();
 
     private TenantLocale Load()
@@ -29,7 +31,7 @@ public sealed class TenantLocaleAccessor(AppDbContext db, ITenantProvider tenant
             return TenantLocale.Default;
 
         // Cached: used on almost every page (prices and dates)
-        return cache.GetOrCreate($"tenant:{tenantId}:locale", entry =>
+        return cache.GetOrCreate(CacheKey(tenantId), entry =>
         {
             entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10);
             return db.TenantSettings.AsNoTracking()

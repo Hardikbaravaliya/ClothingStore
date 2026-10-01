@@ -1,7 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
+  <PropertyGroup>
+    <!-- Jwt:SigningKey lives here locally: dotnet user-secrets set "Jwt:SigningKey" "<64 random bytes, base64>" -->
+    <UserSecretsId>f6f235d5-9287-4039-8088-81dafd0906d4</UserSecretsId>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
 
   <ItemGroup>

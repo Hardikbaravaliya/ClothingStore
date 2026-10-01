@@ -1,3 +1,4 @@
+using ClothingStore.Contracts.Store;
 using ClothingStore.Services.Store;
 using Microsoft.AspNetCore.Mvc;
 
