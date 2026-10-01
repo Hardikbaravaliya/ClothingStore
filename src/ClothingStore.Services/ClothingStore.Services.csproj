@@ -1,0 +1,8 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ClothingStore.Core\ClothingStore.Core.csproj" />
+    <ProjectReference Include="..\ClothingStore.Infrastructure\ClothingStore.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

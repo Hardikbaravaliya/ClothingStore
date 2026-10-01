@@ -1,0 +1,10 @@
+@model ClothingStore.Catalog.ApiClients.StoreSettings
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="text-center py-5">
+    <h1 class="display-5">@Model.Name</h1>
+    <p class="lead text-muted">Girls Wear &amp; Boys Wear</p>
+    <p class="small text-muted">Prices in @Model.CurrencyCode (@Model.CurrencySymbol)</p>
+</div>

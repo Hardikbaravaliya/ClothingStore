@@ -1,0 +1,32 @@
+@model ClothingStore.Services.Store.StoreSettingsDto?
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h1 class="h3 mb-4">Welcome, @User.FindFirst(ClothingStore.Core.Common.AppClaimTypes.FullName)?.Value</h1>
+
+@if (Model is null)
+{
+    <div class="card">
+        <div class="card-body">
+            <h2 class="h5">Super Admin</h2>
+            <p class="mb-0 text-muted">Tenant management and subscription plans come in a later phase.</p>
+        </div>
+    </div>
+}
+else
+{
+    <div class="card">
+        <div class="card-body">
+            <h2 class="h5">@Model.Name</h2>
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Store code</dt>
+                <dd class="col-sm-9">@Model.Slug</dd>
+                <dt class="col-sm-3">Currency</dt>
+                <dd class="col-sm-9">@Model.CurrencyCode (@Model.CurrencySymbol)</dd>
+                <dt class="col-sm-3">Time zone</dt>
+                <dd class="col-sm-9">@Model.TimeZoneId</dd>
+            </dl>
+        </div>
+    </div>
+}

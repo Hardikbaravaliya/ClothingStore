@@ -444,7 +444,7 @@ Live jati vakhte **fakt config badlay, code nahi.**
 
 | Phase | Kaam | Status |
 |---|---|---|
-| 1 | Solution setup, Core, Infrastructure, **Multi-tenancy (Tenants, TenantId, query filter, middleware)**, DB tables, Identity, Migrations | ⏳ Pending |
+| 1 | Solution setup, Core, Infrastructure, **Multi-tenancy (Tenants, TenantId, query filter, middleware)**, DB tables, Identity, Migrations | ✅ Done |
 | 2 | Manager: Category, Product, Variants, Images, Supplier, Purchase, Stock | ⏳ Pending |
 | 3 | Api + Catalog: Product list/detail, filter, cart, checkout, payment, order | ⏳ Pending |
 | 4 | Manager: Order management + Shiprocket; Catalog: tracking page | ⏳ Pending |
@@ -465,6 +465,16 @@ Live jati vakhte **fakt config badlay, code nahi.**
 ## 16. Changelog
 
 > Navo change aave to **upar** navi line add karo: `YYYY-MM-DD – shu badlayu`
+
+- **2026-10-01** – **Phase 1 puro.** Solution (6 projects + tests), badha tables, `InitialCreate` migration, Identity,
+  tenant query filter ane SaveChanges rules, Api `X-Tenant`/subdomain resolution, Manager login.
+  Nakki karela nirnayo:
+  - **Manager login ma "Store code"** field: staff email fakt tenant ma unique chhe, etle login vakhte store jaanvo pade. Khali = Super Admin.
+  - Catalog Api ne `X-Tenant` ma potano **host** mokle (`shop1.localhost`); Api j host → tenant nakki kare (subdomain ke custom domain).
+  - Haal **Services direct `AppDbContext`** vapare chhe (EF Core pote repository/unit of work chhe). Generic `IRepository` nathi banavyu.
+  - Business tables na FK default **Restrict**; fakt child rows (OrderItems, PurchaseItems, ProductImages, ProductVariants, CartItems, Addresses, TrackingLogs) par Cascade.
+  - Enums DB ma **string** tarike save; badha `DateTime` UTC (read vakhte `Kind=Utc`).
+  - Local ports: Catalog `5101` (http, subdomain mate), Manager `5002`, Api `5003`. `global.json` thi .NET 9 SDK pin (VS 2022 mate).
 
 - **2026-10-01** – Haal badhu **local** par: images local folder ma, Razorpay test mode, Fake shipping, smtp4dev. Provider pattern thi live par fakt config switch. Section 13 (Local development setup) add karyo. Plans testing pachhi kharidva.
 - **2026-09-30** – Tenant settings ma **TimeZone ane Currency** add karya. DB ma UTC date, display tenant timezone ma, Orders/Payments/Purchases ma CurrencyCode snapshot.

@@ -1,0 +1,26 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "manager",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/ClothingStore.Manager", "--launch-profile", "https"],
+      "port": 5002,
+      "url": "https://localhost:5002"
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/ClothingStore.Api", "--launch-profile", "https"],
+      "port": 5003,
+      "url": "https://localhost:5003"
+    },
+    {
+      "name": "catalog",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/ClothingStore.Catalog", "--launch-profile", "http"],
+      "port": 5101,
+      "url": "http://localhost:5101"
+    }
+  ]
+}
